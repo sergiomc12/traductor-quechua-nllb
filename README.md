@@ -56,8 +56,8 @@ uso no comercial.
 ```bash
 MODELO_DIR=models/principal_s0/mejor uvicorn src.servicio.api:app --port 8088
 curl -s localhost:8088/traducir -H 'content-type: application/json' -d '{"texto":"Buenos días","origen":"es","destino":"qu"}'
-bash deploy/desplegar.sh traductor.<dominio> <correo>      # sube a la VM, systemd + nginx + certbot
-cd app/android && gradle assembleRelease -PAPI_URL=https://traductor.<dominio>
+bash deploy/desplegar.sh quechua.racinghorse.net <correo>   # AlmaLinux: systemd (quechua-api) + nginx + certbot
+cd app/android && gradle assembleRelease -PAPI_URL=https://quechua.racinghorse.net
 ```
 
 ## Uso de asistentes de IA
