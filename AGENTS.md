@@ -199,3 +199,13 @@ Requisitos del PDF (`redesneuronales/examenfinal/ExamenFinal_MIA_203 (1).pdf`) y
 - Licencias: declarar en el paper que los datasets de HF no declaran licencia (origen publicaciones de una sola organización) y verificar la de NLLB (CC-BY-NC). **Pendiente.**
 - Repo: `README.md`, `requirements.txt`, `src/`, `configs/`, `results/`, notebook de demo en Colab, semillas fijas, enlace a pesos, commits de todos, etiqueta `v1.0-final`. Hoy no hay git ni nada de eso (los scripts están en `scripts/`).
 - Entregables: paper IEEE ≤12 págs con sección *Contribuciones*, diapositivas (25 min), declaración de uso de asistentes de IA. Entrega: 6-nov (sección C) o 7-nov (A y B).
+
+## 8. Decisiones de 5-nov-2026 (tarde): sin texto religioso
+
+- Auditoria: el filtro de 5 palabras (Dios/Jehova/...) marcaba 34 %; el filtro ampliado (`src/marcar_religioso.py`, vocabulario de las revistas + citas + formas quechuas con sufijos) marca 55 % (train), 49 % (valid), 56 % (test). Hay ademas pares mal alineados.
+- **Decision del usuario:** quitar el texto religioso (tipo publicaciones de una sola organización) de TODO el proyecto. Se entrena, valida y prueba solo con `data/limpio/ayacucho_general/` (49 414 / 3 477 / 2 662 pares). No se puede aislar publicaciones de una sola organización exacto: el dataset de HF no marca la fuente por fila; el filtro es conservador y puede dejar algo sin detectar.
+- Ablacion de R4 = tamano del entrenamiento (25 / 50 / 100 %), 3 semillas en el principal. Las corridas con 30 % y 100 % religioso se cancelaron.
+- Linea base zero-shot (mismo test general): es->qu chrF++ 26.4 / BLEU 3.2; qu->es chrF++ 27.6 / BLEU 9.7 (`results/baseline_zeroshot/`).
+- Entrenamiento en Windows: sin `torch.cuda.set_per_process_memory_fraction(0.8)` la GPU desborda a RAM compartida y se frena ~4x. NO usar `PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb` (empeora).
+- Despliegue: servidor AlmaLinux 13.140.220.221; `traductor.racinghorse.net` / `traductor.service` / `/opt/traductor` son de OTRA app (tutor de ingles): no tocar. Este proyecto usa `quechua.racinghorse.net`, `quechua-api`, puerto 8090, `/opt/quechua`. DNS en Contabo (registro A ya creado). Certbot con `sergiomc12@gmail.com`.
+- Paper: `paper/construir.py` genera Paper.pdf (IEEEtran) y Paper.docx desde `paper/contenido.py` + `paper/resultados.py`. Faltan: resultados, tareas por integrante (Contribuciones), enlace de pesos.

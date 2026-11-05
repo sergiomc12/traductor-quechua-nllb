@@ -20,7 +20,7 @@ for exp in cfg["experimentos"]:
     p = {**cfg["comun"], **exp}
     cmd = [sys.executable, "-X", "utf8", str(RAIZ / "src" / "finetune.py"), "--nombre", p["nombre"], "--semilla", str(p["semilla"]),
            "--epocas", str(p["epocas"]), "--batch", str(p["batch"]), "--lr", str(p["lr"]), "--precision", p["precision"],
-           "--frac-biblico", str(p["frac_biblico"]), "--guardar-pesos" if p["guardar_pesos"] else "--no-guardar-pesos"]
+           "--frac-datos", str(p["frac_datos"]), "--guardar-pesos" if p["guardar_pesos"] else "--no-guardar-pesos"]
     print("[run]", " ".join(cmd), flush=True)
     if subprocess.run(cmd, check=False).returncode != 0:
         print(f"[ERROR] {exp['nombre']} fallo; se continua con el siguiente", flush=True)

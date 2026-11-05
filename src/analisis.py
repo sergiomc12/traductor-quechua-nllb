@@ -17,10 +17,9 @@ from sacrebleu.metrics import CHRF
 
 RAIZ = Path(__file__).resolve().parent.parent
 RES = RAIZ / "results"
-GRUPOS = {"principal (30% biblico)": ["principal_s0", "principal_s1", "principal_s2"],
-          "ablacion: 100% biblico": ["ablacion_biblico100_s0"],
-          "ablacion: 0% biblico": ["ablacion_biblico0_s0"]}
-DOMS = ["no_biblico", "biblico"]
+GRUPOS = {"principal (100 % de los datos)": ["principal_s0", "principal_s1", "principal_s2"],
+          "ablacion: 50 % de los datos": ["ablacion_datos50_s0"],
+          "ablacion: 25 % de los datos": ["ablacion_datos25_s0"]}
 DIRS = ["es->qu", "qu->es"]
 SUFIJOS = ["kuna", "pa", "manta", "wan", "man", "pi", "paq", "mi", "taq", "chik", "ku", "sqa"]
 
@@ -30,25 +29,23 @@ def cargar(nombre: str) -> dict | None:
     return json.loads(f.read_text(encoding="utf-8")) if f.exists() else None
 
 
+def pm(x: np.ndarray) -> str:
+    return f"{x.mean():.1f} ± {x.std(ddof=1):.1f}" if len(x) > 1 else f"{x.mean():.1f}"
+
+
 def tabla_principal() -> str:
-    base = json.loads((RAIZ / "data" / "limpio" / "baseline_nllb600m_zeroshot.json").read_text(encoding="utf-8"))
-    filas = ["| Sistema | Dominio | Direccion | chrF++ | BLEU |", "|---|---|---|---|---|"]
-    for dom in DOMS:
+    filas = ["| Sistema | Direccion | chrF++ | BLEU |", "|---|---|---|---|"]
+    base = cargar("baseline_zeroshot")
+    if base:
         for d in DIRS:
-            b = base.get(f"{dom}_{d}")
-            if b:
-                filas.append(f"| zero-shot NLLB-600M (linea base) | {dom} | {d} | {b['chrF++']} | {b['BLEU']} |")
+            filas.append(f"| zero-shot NLLB-600M (linea base) | {d} | {base[d]['chrF++']} | {base[d]['BLEU']} |")
     for grupo, nombres in GRUPOS.items():
         rs = [r for r in map(cargar, nombres) if r]
-        if not rs:
-            continue
-        for dom in DOMS:
-            for d in DIRS:
-                c = np.array([r[f"{dom}_{d}"]["chrF++"] for r in rs])
-                b = np.array([r[f"{dom}_{d}"]["BLEU"] for r in rs])
-                pm = lambda x: f"{x.mean():.1f} ± {x.std(ddof=1):.1f}" if len(x) > 1 else f"{x.mean():.1f}"
-                filas.append(f"| {grupo} (n={len(rs)}) | {dom} | {d} | {pm(c)} | {pm(b)} |")
-    return "\n".join(filas)
+        for d in DIRS if rs else []:
+            c = np.array([r[d]["chrF++"] for r in rs])
+            b = np.array([r[d]["BLEU"] for r in rs])
+            filas.append(f"| {grupo} (n={len(rs)}) | {d} | {pm(c)} | {pm(b)} |")
+    return chr(10).join(filas)
 
 
 def costo() -> str:
@@ -71,7 +68,6 @@ def chrf_seg(hip: pd.Series, ref: pd.Series) -> float:
 
 def errores(nombre: str = "principal_s0") -> str:
     df = pd.read_csv(RES / nombre / "test_predicciones.tsv", sep="\t", keep_default_na=False)
-    df["biblico"] = df["biblico"].astype(str).str.lower().eq("true")
     df["n_pal_ref"] = df["ref"].str.split().str.len()
     df["bucket"] = pd.cut(df["n_pal_ref"], [0, 5, 10, 20, 40, 10_000], labels=["1-5", "6-10", "11-20", "21-40", ">40"])
     out = []
@@ -104,8 +100,8 @@ def errores(nombre: str = "principal_s0") -> str:
     from sacrebleu.metrics import CHRF as C
     sentencia = C(word_order=2)
     df["chrf"] = [sentencia.sentence_score(h, [r]).score for h, r in zip(df["hip"], df["ref"])]
-    out.append("\n### Ejemplos de error (no biblicos, chrF++ por frase mas bajo con ref. de 6-30 palabras)\n")
-    pool = df[(~df["biblico"]) & df["n_pal_ref"].between(6, 30)].nsmallest(6, "chrf")
+    out.append("\n### Ejemplos de error (chrF++ por frase mas bajo con ref. de 6-30 palabras)\n")
+    pool = df[df["n_pal_ref"].between(6, 30)].nsmallest(6, "chrf")
     for _, r in pool.iterrows():
         out.append(f"- **{r['direccion']}** (chrF++ {r['chrf']:.0f})\n  - src: {r['src']}\n  - ref: {r['ref']}\n  - hip: {r['hip']}")
     return "\n".join(out)
@@ -113,19 +109,20 @@ def errores(nombre: str = "principal_s0") -> str:
 
 def figuras() -> None:
     fig, ax = plt.subplots(1, 2, figsize=(9, 3.2))
-    for nombres, color, et in ((GRUPOS["principal (30% biblico)"], "C0", "principal 30%"), (GRUPOS["ablacion: 100% biblico"], "C1", "100% biblico"), (GRUPOS["ablacion: 0% biblico"], "C2", "0% biblico")):
+    for (nombre, nombres), color in zip(GRUPOS.items(), ("C0", "C1", "C2")):
         for i, n in enumerate(nombres):
             f = RES / n / "historial.json"
             if not f.exists():
                 continue
             h = json.loads(f.read_text(encoding="utf-8"))["historial"]
             ep = [x["epoca"] for x in h]
-            ax[0].plot(ep, [x["loss"] for x in h], color=color, marker="o", label=et if i == 0 else None)
-            ax[1].plot(ep, [(x["chrF++_es->qu"] + x["chrF++_qu->es"]) / 2 for x in h], color=color, marker="o", label=et if i == 0 else None)
+            et = nombre.split(" (")[0] if i == 0 else None
+            ax[0].plot(ep, [x["loss"] for x in h], color=color, marker="o", label=et)
+            ax[1].plot(ep, [(x["chrF++_es->qu"] + x["chrF++_qu->es"]) / 2 for x in h], color=color, marker="o", label=et)
     ax[0].set(xlabel="Epoca", ylabel="Perdida de entrenamiento (media)", title="Perdida")
-    ax[1].set(xlabel="Epoca", ylabel="chrF++ medio (valid no biblico)", title="Validacion")
-    for a in ax:
-        a.grid(alpha=.3); a.legend(); a.set_xticks([1, 2, 3])
+    ax[1].set(xlabel="Epoca", ylabel="chrF++ medio (validacion)", title="Validacion")
+    for a_ in ax:
+        a_.grid(alpha=.3); a_.legend(fontsize=7); a_.set_xticks([1, 2, 3])
     fig.tight_layout()
     fig.savefig(RES / "fig_curvas.png", dpi=200)
 

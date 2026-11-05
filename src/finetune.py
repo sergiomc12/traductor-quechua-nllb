@@ -1,13 +1,14 @@
 """Fine-tuning de NLLB-200-distilled-600M para es<->quy (Ayacucho), bidireccional.
 
 Ejemplo (un experimento completo = una configuracion de configs/):
-  python -X utf8 src/finetune.py --nombre principal_s0 --semilla 0 --frac-biblico 0.3
+  python -X utf8 src/finetune.py --nombre principal_s0 --semilla 0 --frac-datos 1.0
 
 Decisiones (ver AGENTS.md §6):
   - Una variedad (Ayacucho): NLLB solo tiene quy_Latn y los papers no mezclan variedades.
   - Un modelo para ambas direcciones: cada par genera dos ejemplos (es->qu y qu->es).
-  - El contenido biblico se reduce con --frac-biblico (ablacion: 0.3 vs 1.0).
-  - Mejor punto por chrF++ medio en valid NO biblico; ese punto se evalua UNA vez en test.
+  - Se entrena SOLO con texto no religioso (data/limpio/ayacucho_general, ver src/marcar_religioso.py).
+  - Ablacion: --frac-datos usa una fraccion del entrenamiento (0.25, 0.5, 1.0).
+  - Mejor punto por chrF++ medio en valid; ese punto se evalua UNA vez en test.
   - Precision: bf16 si la GPU lo soporta; si no (Colab T4) fp16 con GradScaler.
 Solo usa PyTorch + transformers + sacrebleu (sin accelerate/Trainer).
 Salidas: models/<nombre>/mejor (pesos), results/<nombre>/{historial,test}.json y test_predicciones.tsv.
@@ -45,7 +46,7 @@ def parsear_args() -> argparse.Namespace:
     p.add_argument("--batch", type=int, default=32)
     p.add_argument("--lr", type=float, default=3e-5)
     p.add_argument("--warmup", type=float, default=0.05)
-    p.add_argument("--frac-biblico", type=float, default=0.3)
+    p.add_argument("--frac-datos", type=float, default=1.0, help="fraccion del entrenamiento a usar (ablacion de tamano)")
     p.add_argument("--n-valid", type=int, default=500)
     p.add_argument("--n-test", type=int, default=0, help="0 = test completo")
     p.add_argument("--precision", choices=["auto", "bf16", "fp16"], default="auto")
@@ -62,15 +63,12 @@ def fijar_semillas(semilla: int) -> None:
 
 
 def leer(split: str) -> pd.DataFrame:
-    df = pd.read_csv(RAIZ / "data" / "limpio" / "ayacucho" / f"{split}.tsv", sep="\t", keep_default_na=False)
-    df["biblico"] = df["biblico"].astype(str).str.lower().eq("true")
-    return df
+    return pd.read_csv(RAIZ / "data" / "limpio" / "ayacucho_general" / f"{split}.tsv", sep="	", keep_default_na=False)
 
 
-def cargar_train(frac_biblico: float, semilla: int) -> pd.DataFrame:
+def cargar_train(frac: float, semilla: int) -> pd.DataFrame:
     df = leer("train")
-    bib = df[df["biblico"]].sample(frac=frac_biblico, random_state=semilla) if frac_biblico < 1 else df[df["biblico"]]
-    return pd.concat([df[~df["biblico"]], bib]).sample(frac=1, random_state=semilla).reset_index(drop=True)
+    return df.sample(frac=frac, random_state=semilla).reset_index(drop=True)
 
 
 def armar_lotes(df: pd.DataFrame, batch: int) -> list[tuple[str, str, list[str], list[str]]]:
@@ -133,10 +131,8 @@ def evaluar_test(tok, modelo, test: pd.DataFrame, dtipo, salida: Path) -> dict:
     filas, resumen = [], {}
     for o, d in DIRECCIONES:
         hip = traducir(tok, modelo, test[o].tolist(), o, d, dtipo)
-        for dom, mask in (("no_biblico", ~test["biblico"]), ("biblico", test["biblico"]), ("todo", test["biblico"] | ~test["biblico"])):
-            m = mask.to_numpy()
-            resumen[f"{dom}_{o}->{d}"] = {**metricas([h for h, k in zip(hip, m) if k], test.loc[mask, d].tolist()), "n": int(m.sum())}
-        filas.append(pd.DataFrame({"direccion": f"{o}->{d}", "src": test[o], "ref": test[d], "hip": hip, "biblico": test["biblico"]}))
+        resumen[f"{o}->{d}"] = {**metricas(hip, test[d].tolist()), "n": len(test)}
+        filas.append(pd.DataFrame({"direccion": f"{o}->{d}", "src": test[o], "ref": test[d], "hip": hip}))
     pd.concat(filas).to_csv(salida / "test_predicciones.tsv", sep="\t", index=False)
     return resumen
 
@@ -155,13 +151,13 @@ def main() -> None:
     carpeta_mod = RAIZ / "models" / args.nombre
     carpeta_res.mkdir(parents=True, exist_ok=True)
 
-    train = cargar_train(args.frac_biblico, args.semilla)
+    train = cargar_train(args.frac_datos, args.semilla)
     valid_all = leer("valid")
-    valid = valid_all[~valid_all["biblico"]].sample(min(args.n_valid, int((~valid_all["biblico"]).sum())), random_state=args.semilla)
+    valid = valid_all.sample(min(args.n_valid, len(valid_all)), random_state=args.semilla)
     test = leer("test")
     if args.n_test:
         test = test.sample(args.n_test, random_state=0).reset_index(drop=True)
-    print(f"[{args.nombre}] precision={dtipo} train={len(train)} ({int(train['biblico'].sum())} biblicos) valid_nb={len(valid)} test={len(test)}", flush=True)
+    print(f"[{args.nombre}] precision={dtipo} train={len(train)} valid={len(valid)} test={len(test)}", flush=True)
 
     tok = AutoTokenizer.from_pretrained(MODELO)
     modelo = AutoModelForSeq2SeqLM.from_pretrained(MODELO).to("cuda").train()  # pesos fp32 + autocast

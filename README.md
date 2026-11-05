@@ -1,7 +1,7 @@
 # Traductor español ↔ quechua (Ayacucho) — MIA-203, Examen Final
 
 Fine-tuning bidireccional de **NLLB-200-distilled-600M** (`quy_Latn`) con datos limpiados y repartidos sin fuga,
-evaluado contra una línea base zero-shot, con ablación del sesgo bíblico (publicaciones de una sola organización), análisis de errores,
+evaluado contra una línea base zero-shot, entrenado solo con texto no religioso (se excluye el contenido de tipo publicaciones de una sola organización), con ablación del tamaño del entrenamiento, análisis de errores,
 servicio HTTP, app Android y despliegue en nginx.
 
 Resultados y tablas: `results/tablas.md` (se regenera con un comando, ver abajo). Detalle del proceso: `AGENTS.md`.
@@ -28,7 +28,9 @@ pip install -r requirements.txt
 python -X utf8 src/limpiar_datos.py
 # 2. Línea base zero-shot
 python -X utf8 src/baseline_nllb.py
-# 3. Entrenar + ablaciones + semillas (configs/experimentos.json). ~3 h en RTX PRO 5000
+# 2b. Excluir texto religioso (crea data/limpio/ayacucho_general/)
+python -X utf8 src/marcar_religioso.py
+# 3. Entrenar + ablaciones + semillas (configs/experimentos.json). ~1.5 h en RTX PRO 5000
 python -X utf8 src/correr_experimentos.py
 # 4. Tablas y figuras del artículo
 python -X utf8 src/analisis.py
@@ -46,7 +48,7 @@ Sin entrenar: `notebooks/demo_colab.ipynb` carga los pesos y traduce.
 | `pollitoconpapass/cuzco-quechua-translation-spanish` | Cusco (`quz`) — descartado (no se mezclan variedades) | no declarada |
 
 Descargar a `data/hf_somosnlp_spanish_to_quechua/` y `data/hf_pollitoconpapass_cuzco/` (parquet).
-Tras la limpieza: 122 802 pares (109 807 / 6 877 / 6 118 en train/valid/test), 0 filas de fuga entre particiones.
+Tras la limpieza: 122 802 pares (109 807 / 6 877 / 6 118), 0 filas de fuga entre particiones. `src/marcar_religioso.py` marca el 55 % como religioso (filtro conservador) y **esas filas se excluyen de entrenamiento, validación y prueba**: quedan 49 414 / 3 477 / 2 662 pares en `data/limpio/ayacucho_general/`. El filtro puede dejar algo de texto religioso sin detectar.
 
 ## Pesos
 Enlace: **PENDIENTE** (subir `models/principal_s0/mejor` a Hugging Face o Drive y pegar aquí). Licencia: NLLB-200 es CC-BY-NC 4.0 →

@@ -6,7 +6,7 @@ Los numeros de resultados se leen de results/ (ver resultados.py); si faltan, la
 """
 from __future__ import annotations
 
-TITULO = "Traducción neuronal español–quechua ayacuchano con NLLB-200 ajustado: efecto del corpus religioso en la evaluación"
+TITULO = "Traducción neuronal español–quechua ayacuchano con NLLB-200 ajustado sobre texto no religioso"
 
 AUTORES = [
     ("Flavio César Amayo Gamboa", "flavio.amayo.g@uni.pe"),
@@ -62,16 +62,19 @@ def secciones_previas() -> list[tuple]:
         ("p", "Usamos aprendizaje profundo porque existe un modelo multilingüe preentrenado, NLLB-200, que ya incluye el quechua ayacuchano (quy_Latn) [1]. "
               "Es un Transformer codificador-decodificador [2], y ajustarlo con unas cien mil oraciones es viable en una sola GPU. "
               "No entrenamos desde cero porque unas cien mil oraciones no bastan para ello."),
-        ("p", "Los conjuntos públicos disponibles en Hugging Face tienen tres problemas que cambian los números reportados. "
+        ("p", "Los conjuntos públicos disponibles en Hugging Face tienen problemas que cambian los números reportados. "
               "En el conjunto de Ayacucho, el 7.3 % de las oraciones en español de validación y el 6.9 % de las de prueba ya estaban en entrenamiento. "
-              "Una de cada tres filas es texto bíblico o de las publicaciones de publicaciones de una sola organización [11]. "
-              "Y hay duplicados y pares mal alineados. Con ese material, un promedio global mezcla dominios y no permite saber cuánto traduce el modelo fuera del texto religioso."),
+              "Más de la mitad de las filas son de contenido religioso, en buena parte del tipo de las publicaciones de publicaciones de una sola organización [11]. "
+              "Y hay duplicados y pares mal alineados. Un traductor entrenado con ese material aprende sobre todo el estilo de esas publicaciones, "
+              "y un promedio global sobre su conjunto de prueba no dice cuánto traduce fuera de él."),
+        ("p", "Nuestra decisión fue excluir el texto religioso del entrenamiento, la validación y la prueba, y entrenar solo con lo que queda: 49 414 pares de entrenamiento. "
+              "Es menos de la mitad de los datos, así que medimos también cuánto aporta el tamaño del conjunto."),
         ("p", "Las contribuciones son:"),
         ("bullets", [
-            "Un conjunto de 122 802 pares español–quechua ayacuchano, limpiado, sin fuga entre particiones y con una marca de dominio (bíblico o no bíblico).",
-            "Un modelo bidireccional, NLLB-200 de 600 millones de parámetros ajustado, entrenado con tres semillas y comparado con el mismo modelo sin ajustar.",
-            "Una ablación sobre la proporción de texto bíblico en el entrenamiento (0 %, 30 % y 100 %), con evaluación separada por dominio.",
-            "Un análisis de errores por longitud, dominio y sufijos, y el servicio y la aplicación Android que usan el modelo.",
+            "Un conjunto de 122 802 pares español–quechua ayacuchano, limpiado y sin fuga entre particiones, y su subconjunto no religioso de 55 553 pares (49 414, 3 477 y 2 662 en entrenamiento, validación y prueba).",
+            "Un modelo bidireccional, NLLB-200 de 600 millones de parámetros ajustado con tres semillas y comparado con el mismo modelo sin ajustar.",
+            "Una ablación sobre el tamaño del entrenamiento (25 %, 50 % y 100 % de los datos).",
+            "Un análisis de errores por longitud y sufijos, y el servicio y la aplicación Android que usan el modelo.",
         ]),
         ("p", "La Sección II resume trabajos previos, la III describe datos y método, la IV presenta los resultados, la V los discute y la VI concluye."),
 
@@ -86,20 +89,22 @@ def secciones_previas() -> list[tuple]:
         ("p", "Quechua a español. Ortega et al. [10] tradujeron del quechua al español con un modelo neuronal para una lengua polisintética y segmentación BPE guiada por sufijos. "
               "Cueva et al. [9] usaron un Transformer con LMfusion y segmentación PRPE, y construyeron una interfaz web de traducción."),
         ("p", "Este trabajo se diferencia en tres puntos. Parte de una auditoría de los datos abiertos y reparte las particiones sin fuga. "
-              "Mide por separado el efecto de la proporción de texto bíblico en el entrenamiento. "
+              "Excluye el texto religioso del entrenamiento y de la evaluación, y mide cuánto aporta el tamaño del conjunto que queda. "
               "Y entrega un modelo en ambos sentidos con servicio y aplicación, no solo una tabla de métricas."),
 
         ("sec", "Metodología"),
         ("sub", "Datos"),
         ("p", "Usamos el conjunto spanish-to-quechua del hackathon SomosNLP 2022 en Hugging Face, variedad Ayacucho, con columnas es y qu. "
-              "Reúne blogs, Tatoeba, datos de AmericasNLP 2021 y publicaciones de una sola organización [11]. No declara licencia, y su origen en publicaciones de una sola organización impone una restricción de uso que se discute en la Sección V. "
+              "Reúne blogs, Tatoeba, datos de AmericasNLP 2021 y publicaciones de una sola organización [11]. No declara licencia; la parte que proviene de publicaciones de una sola organización tiene derechos de autor, y lo que queda tras el filtro puede seguir incluyendo texto de esa fuente, como se discute en la Sección V. "
               "Descartamos el conjunto de Cusco, también en Hugging Face, porque el quechua es una familia de variedades con inteligibilidad limitada entre las lejanas, en [4] añadir datos de Cusco ayudó menos que añadir datos de Ayacucho, y NLLB solo tiene la etiqueta de Ayacucho."),
         ("p", "La limpieza une las particiones originales, aplica los filtros de la Tabla I y reparte de nuevo por grupos: "
               "todas las filas que comparten una oración en español o en quechua van a la misma partición, elegida con un hash del grupo. "
               "Después de esto, ninguna oración en español ni en quechua aparece en dos particiones. "
-              "Una fila es bíblica si el texto en español o en quechua contiene Dios, Jehová, Biblia, bíblico, Jesús o Cristo; esto marca el 34.0 % de las filas limpias."),
+              "Cada fila se marca como religiosa o no. Un primer filtro de cinco palabras (Dios, Jehová, Biblia, Jesús, Cristo) marcó el 34.0 % de las filas, pero una revisión de muestras mostró que dejaba pasar texto del mismo tipo: vocabulario de las revistas (congregación, predicar, adoración), citas como (Is. 55: 9), nombres bíblicos y formas quechuas con sufijos como Diospa. "
+              "El filtro final amplía la lista con ese vocabulario y con patrones de cita, y busca en ambos idiomas. Es conservador: ante la duda marca la fila como religiosa, y por eso descarta también algunas oraciones generales con palabras como alma o Padre, y puede dejar algo de texto religioso sin detectar. "
+              "Marca el 55.0 % del entrenamiento, el 49.4 % de la validación y el 56.5 % de la prueba. Esas filas se excluyen de todas las particiones."),
         ("table", "tab:limpieza", "Resumen de la limpieza (variedad Ayacucho)", ["Paso", "Filas"], [list(f) for f in DESCARTES]),
-        ("p", "Las particiones quedan en 109 807 pares de entrenamiento, 6 877 de validación y 6 118 de prueba."),
+        ("p", "Antes de excluir el texto religioso las particiones tenían 109 807, 6 877 y 6 118 pares. Después quedan 49 414 de entrenamiento, 3 477 de validación y 2 662 de prueba."),
         ("sub", "Modelo"),
         ("p", "Partimos de NLLB-200-distilled-600M [1], un Transformer [2] de codificador y decodificador con etiquetas de idioma en la entrada. "
               "Un solo modelo traduce en ambos sentidos: cada par genera dos ejemplos, uno de es a qu (etiquetas spa_Latn y quy_Latn) y otro de qu a es. "
@@ -110,14 +115,14 @@ def secciones_previas() -> list[tuple]:
                "L(θ) = −(1/|B|) Σ(x,y)∈B (1/T) Σt=1..T log pθ(yt | y<t, x)"),
         ("p", "Optimizamos con AdamW [14], tasa de aprendizaje 3·10⁻⁵ y decaimiento de pesos 0.01, calentamiento lineal del 5 % de los pasos y decaimiento lineal después, "
               "recorte de gradiente a norma 1, lotes de 32 oraciones de una sola dirección y 3 épocas. La longitud máxima es de 128 tokens. "
-              "Los pesos se mantienen en fp32 y el cálculo usa bf16 con autocast (fp16 con escalado de gradiente en GPU sin bf16, como la T4 de Colab). Cada época evalúa 500 oraciones de validación no bíblicas con chrF++ medio de ambas direcciones, "
+              "Los pesos se mantienen en fp32 y el cálculo usa bf16 con autocast (fp16 con escalado de gradiente en GPU sin bf16, como la T4 de Colab). Cada época evalúa 500 oraciones de validación no religiosas con chrF++ medio de ambas direcciones, "
               "y se conservan los pesos de la mejor época. La prueba se evalúa una sola vez con esos pesos, con búsqueda en haz de ancho 4. "
-              "Las semillas son 0, 1 y 2; cambian el orden de los lotes y el submuestreo del texto bíblico."),
+              "Las semillas son 0, 1 y 2; cambian el orden de los lotes y las 500 oraciones de validación. La ablación usa una fracción aleatoria del entrenamiento (25 % y 50 %) con la semilla 0."),
         ("sub", "Línea base y métricas"),
-        ("p", "La línea base es NLLB-200-distilled-600M sin ajustar (zero-shot) sobre el mismo conjunto de prueba. "
+        ("p", "La línea base es NLLB-200-distilled-600M sin ajustar (zero-shot) sobre el mismo conjunto de prueba sin texto religioso. "
               "Como referencia publicada, el sistema ganador de 2021 obtuvo 34.6 de chrF en la prueba de AmericasNLP [3], [4]; no es comparable de forma directa porque el conjunto de prueba es otro. "
               "La métrica principal es chrF++ [12], más adecuada que BLEU para una lengua aglutinante, y reportamos también BLEU de sacreBLEU [13]. "
-              "Los resultados se separan por dirección y por dominio, y se promedian entre semillas con su desviación estándar."),
+              "Los resultados se separan por dirección y se promedian entre semillas con su desviación estándar."),
     ]
 
 

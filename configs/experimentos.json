@@ -1,10 +1,10 @@
 {
   "comun": {"epocas": 3, "batch": 32, "lr": 3e-5, "precision": "auto"},
   "experimentos": [
-    {"nombre": "principal_s0", "semilla": 0, "frac_biblico": 0.3, "guardar_pesos": true},
-    {"nombre": "ablacion_biblico100_s0", "semilla": 0, "frac_biblico": 1.0, "guardar_pesos": false},
-    {"nombre": "principal_s1", "semilla": 1, "frac_biblico": 0.3, "guardar_pesos": false},
-    {"nombre": "principal_s2", "semilla": 2, "frac_biblico": 0.3, "guardar_pesos": false},
-    {"nombre": "ablacion_biblico0_s0", "semilla": 0, "frac_biblico": 0.0, "guardar_pesos": false}
+    {"nombre": "principal_s0", "semilla": 0, "frac_datos": 1.0, "guardar_pesos": true},
+    {"nombre": "ablacion_datos25_s0", "semilla": 0, "frac_datos": 0.25, "guardar_pesos": false},
+    {"nombre": "ablacion_datos50_s0", "semilla": 0, "frac_datos": 0.5, "guardar_pesos": false},
+    {"nombre": "principal_s1", "semilla": 1, "frac_datos": 1.0, "guardar_pesos": false},
+    {"nombre": "principal_s2", "semilla": 2, "frac_datos": 1.0, "guardar_pesos": false}
   ]
 }
