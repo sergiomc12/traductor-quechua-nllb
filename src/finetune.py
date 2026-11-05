@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import random
 import time
 from pathlib import Path
@@ -33,6 +34,7 @@ DIRECCIONES = (("es", "qu"), ("qu", "es"))
 MAX_LEN = 128
 BATCH_EVAL = 32
 BEAMS = 4
+FRACCION_VRAM = 0.8
 
 
 def parsear_args() -> argparse.Namespace:
@@ -144,6 +146,8 @@ def main() -> None:
     if not torch.cuda.is_available():
         raise SystemExit("Se necesita CUDA para entrenar; no se entrena en CPU.")
     fijar_semillas(args.semilla)
+    # Tope de VRAM: sin el, en Windows (WDDM) la GPU desborda a RAM compartida y se frena ~4x.
+    torch.cuda.set_per_process_memory_fraction(FRACCION_VRAM)
     dtipo = elegir_precision(args.precision)
     usar_escala = dtipo == torch.float16
     escala = torch.amp.GradScaler("cuda", enabled=usar_escala)
@@ -184,8 +188,10 @@ def main() -> None:
             opt.zero_grad(set_to_none=True)
             perdidas.append(perdida.item())
             paso += 1
+            if paso % 500 == 0:
+                torch.cuda.empty_cache()
             if paso % 200 == 0:
-                print(f"epoca {epoca} paso {paso}/{total} loss {sum(perdidas[-200:]) / 200:.3f} ({time.time() - t0:.0f}s)", flush=True)
+                print(f"epoca {epoca} paso {paso}/{total} loss {sum(perdidas[-200:]) / 200:.3f} ({time.time() - t0:.0f}s, pico {torch.cuda.max_memory_allocated() / 2**30:.1f} GB)", flush=True)
             if args.max_pasos and paso >= args.max_pasos:
                 break
         m = evaluar_valid(tok, modelo, valid, dtipo)

@@ -16,3 +16,7 @@ app/android/app/build/
 app/android/local.properties
 *.keystore
 *.jks
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/__pycache__/
