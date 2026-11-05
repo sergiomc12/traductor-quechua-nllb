@@ -1,0 +1,14 @@
+# Entrenamiento / evaluacion (Colab T4 o GPU local). Instalar torch segun tu CUDA:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu128
+torch>=2.4
+transformers>=4.44
+sentencepiece
+sacrebleu>=2.4
+pandas
+pyarrow
+numpy
+matplotlib
+# Servicio de traduccion (despliegue)
+fastapi
+uvicorn[standard]
+pydantic>=2

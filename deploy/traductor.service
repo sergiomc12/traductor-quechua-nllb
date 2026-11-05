@@ -1,0 +1,16 @@
+[Unit]
+Description=Traductor Quechua-Espanol (FastAPI + NLLB)
+After=network.target
+
+[Service]
+User=traductor
+WorkingDirectory=/opt/traductorquechua
+Environment=MODELO_DIR=/opt/traductorquechua/models/principal_s0/mejor
+ExecStart=/opt/traductorquechua/.venv/bin/uvicorn src.servicio.api:app --host 127.0.0.1 --port 8088 --workers 1
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target
