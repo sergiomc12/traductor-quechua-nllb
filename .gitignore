@@ -22,3 +22,9 @@ paper/*.out
 paper/__pycache__/
 build/
 keystore.pass
+
+# Material de terceros con derechos reservados (MINEDU) y textos derivados: no se versiona
+docs/*.pdf
+docs/*.txt
+/*.pdf
+!paper/Paper.pdf
