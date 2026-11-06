@@ -209,3 +209,12 @@ Requisitos del PDF (`redesneuronales/examenfinal/ExamenFinal_MIA_203 (1).pdf`) y
 - Entrenamiento en Windows: sin `torch.cuda.set_per_process_memory_fraction(0.8)` la GPU desborda a RAM compartida y se frena ~4x. NO usar `PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb` (empeora).
 - Despliegue: servidor AlmaLinux 13.140.220.221; `traductor.racinghorse.net` / `traductor.service` / `/opt/traductor` son de OTRA app (tutor de ingles): no tocar. Este proyecto usa `quechua.racinghorse.net`, `quechua-api`, puerto 8090, `/opt/quechua`. DNS en Contabo (registro A ya creado). Certbot con `sergiomc12@gmail.com`.
 - Paper: `paper/construir.py` genera Paper.pdf (IEEEtran) y Paper.docx desde `paper/contenido.py` + `paper/resultados.py`. Faltan: resultados, tareas por integrante (Contribuciones), enlace de pesos.
+
+## 9. Resultados finales y estado (5-nov-2026, noche)
+
+- 3 semillas, principal (49 414 pares no religiosos): es->qu chrF++ 38.4 ± 0.4 / BLEU 9.8 ± 0.2; qu->es chrF++ 33.3 ± 0.1 / BLEU 14.7. Linea base zero-shot: 26.4 / 27.6. Ablacion de tamano (1 semilla): 25 % -> 34.9 / 31.5; 50 % -> 36.3 / 32.2. Total 1.58 h de GPU de entrenamiento. Tablas: `results/tablas.md`, `results/errores.json`.
+- Ruido del test: 53 de 2 662 pares (2.0 %) son encabezados/fechas (sin ellos 38.4 / 33.0); hay pares desalineados sin cuantificar; 13 salidas es->qu (0.49 %) con repeticiones degeneradas.
+- `src/finetune_ckpt.py`: variante con puntos de control cada 2 000 pasos (probada: interrumpida y retomada en el paso 50). NO se uso para los resultados del paper (el barajado por epoca cambia respecto a `finetune.py`, no reproduce los mismos numeros).
+- `principal_s2` fallo una vez al arrancar (22:24) sin traceback; se relanzo. El PC se reinicio a las 19:15 y mato una corrida: no suspender el equipo durante entrenamientos.
+- Los 7 PDF del MINEDU habian entrado a git por error (raiz del proyecto). Se quitaron del indice y se ignoran (`docs/*.pdf`, `docs/*.txt`); siguen en el historial local (no hay remoto). Antes de publicar el repo, reescribir historial o crear uno limpio.
+- Pendiente: tareas por integrante (Contribuciones), enlace de pesos, diapositivas, evaluacion externa (FLORES-200 quy_Latn).

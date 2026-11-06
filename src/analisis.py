@@ -132,3 +132,52 @@ if __name__ == "__main__":
     (RES / "tablas.md").write_text(texto, encoding="utf-8")
     figuras()
     print(texto)
+
+
+def metricas_errores(nombre: str = "principal_s0") -> dict:
+    """Cifras del analisis de errores en JSON (las lee paper/resultados.py)."""
+    df = pd.read_csv(RES / nombre / "test_predicciones.tsv", sep="\t", keep_default_na=False)
+    mes = r"(ENERO|FEBRERO|MARZO|ABRIL|MAYO|JUNIO|JULIO|AGOSTO|SEPTIEMBRE|OCTUBRE|NOVIEMBRE|DICIEMBRE)"
+
+    def ruido(s: str) -> bool:
+        s = s.strip()
+        if not s or s.startswith("[") or re.search(mes, s) or re.match(r"(?i)^p[aá]gina|^pag\b", s):
+            return True
+        return len(s) < 4 or sum(c.isalpha() for c in s) / max(len(s), 1) < 0.5
+
+    def repite(h: str) -> bool:
+        w = h.lower().split()
+        tri = [" ".join(w[i:i + 3]) for i in range(len(w) - 2)]
+        return bool(re.search(r"\b(\S+)(?: \1){3,}", h.lower())) or any(tri.count(t) >= 3 for t in set(tri))
+
+    df["ruido"] = [ruido(a) or ruido(b) for a, b in zip(df["src"], df["ref"])]
+    df["rep"] = [repite(h) for h in df["hip"]]
+    df["n_pal"] = df["ref"].str.split().str.len()
+    df["bucket"] = pd.cut(df["n_pal"], [0, 5, 10, 20, 40, 10_000], labels=["1-5", "6-10", "11-20", "21-40", ">40"])
+    f = lambda x: round(chrf_seg(x["hip"], x["ref"]), 1)
+    out: dict = {"n_pares": int(len(df) // 2), "n_ruido": int(df["ruido"].sum() // 2), "por_direccion": {}}
+    for d in DIRS:
+        s = df[df["direccion"] == d]
+        suf = {}
+        if d == "es->qu":
+            for sf in SUFIJOS:
+                tot = hit = 0
+                for ref, hip in zip(s["ref"], s["hip"]):
+                    hp = set(re.findall(r"\w+", hip.lower()))
+                    for w in re.findall(r"\w+", ref.lower()):
+                        if w.endswith(sf) and len(w) > len(sf) + 1:
+                            tot += 1
+                            hit += w in hp
+                suf[sf] = {"n": tot, "recall": round(100 * hit / max(tot, 1), 1)}
+        out["por_direccion"][d] = {
+            "chrf_completo": f(s), "chrf_sin_ruido": f(s[~s["ruido"]]), "chrf_solo_ruido": f(s[s["ruido"]]),
+            "n_sin_ruido": int((~s["ruido"]).sum()), "repeticiones": int(s["rep"].sum()),
+            "por_longitud": {str(k): {"chrf": f(g), "n": int(len(g))} for k, g in s.groupby("bucket", observed=False)},
+            "sufijos": suf,
+        }
+    return out
+
+
+if __name__ == "__main__":
+    (RES / "errores.json").write_text(json.dumps(metricas_errores(), indent=2, ensure_ascii=False), encoding="utf-8")
+    print("results/errores.json escrito")

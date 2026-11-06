@@ -2,7 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[spanish,es-tabla]{babel}
-\usepackage{amsmath,booktabs,graphicx,cite}
+\usepackage{amsmath,booktabs,graphicx,cite,adjustbox}
 \usepackage{microtype}
 \hyphenation{aglu-ti-nan-te}
 \renewcommand{\IEEEkeywordsname}{Palabras clave}
@@ -23,7 +23,7 @@
 }
 \maketitle
 \begin{abstract}
-\textbf{[PENDIENTE: resumen con los resultados finales]}
+El quechua ayacuchano tiene pocos textos paralelos con el español, y los conjuntos públicos mezclan duplicados, fuga entre particiones y mucho contenido religioso. Ajustamos NLLB-200 de 600 millones de parámetros como un solo modelo bidireccional español–quechua. Limpiamos y repartimos sin fuga 122 802 pares públicos, excluimos el 55 \% marcado como religioso y entrenamos con 49 414 pares. En una prueba de 2 662 pares sin texto religioso, tres semillas dan un chrF++ de 38.4 $\pm$ 0.4 (es$\rightarrow$qu) y 33.3 $\pm$ 0.1 (qu$\rightarrow$es), frente a 26.4 y 27.6 del mismo modelo sin ajustar, y un BLEU de 9.8 y 14.7. Entrenar con el 25 \%, el 50 \% y el 100 \% de los datos sube el chrF++ es$\rightarrow$qu de 34.9 a 36.3 y a 38.4, sin señal de saturación. El análisis de errores muestra que el 2 \% de la prueba son encabezados y fechas, que hay pares desalineados y que el 0.5 \% de las salidas es$\rightarrow$qu cae en repeticiones. Los cinco entrenamientos suman 1.6 horas en una GPU de 48 GB. El modelo está desplegado como servicio web y aplicación Android. La prueba proviene de la misma fuente que el entrenamiento y no se validó con hablantes, así que los números no miden el uso real.
 \end{abstract}
 \begin{IEEEkeywords}
 traducción automática neuronal, quechua, lenguas de bajos recursos, NLLB, ajuste fino, chrF++
@@ -100,13 +100,88 @@ Optimizamos con AdamW \cite{r14}, tasa de aprendizaje $3\cdot 10^{-5}$ y decaimi
 La línea base es NLLB-200-distilled-600M sin ajustar (zero-shot) sobre el mismo conjunto de prueba sin texto religioso. Como referencia publicada, el sistema ganador de 2021 obtuvo 34.6 de chrF en la prueba de AmericasNLP \cite{r3,r4}; no es comparable de forma directa porque el conjunto de prueba es otro. La métrica principal es chrF++ \cite{r12}, más adecuada que BLEU para una lengua aglutinante, y reportamos también BLEU de sacreBLEU \cite{r13}. Los resultados se separan por dirección y se promedian entre semillas con su desviación estándar.
 
 \section{Resultados}
-\textbf{[PENDIENTE: los experimentos siguen en ejecución; esta sección se completa con las tablas y figuras finales]}
+\subsection{Comparación con la línea base}
+La Tabla II compara el modelo ajustado con NLLB-200 sin ajustar sobre los mismos 2 662 pares de prueba. El ajuste mejora el chrF++ en 12.0 puntos en es$\rightarrow$qu y en 5.7 en qu$\rightarrow$es, y el BLEU de 3.2 a 9.8 y de 9.7 a 14.7. La desviación entre las tres semillas es de 0.4 puntos de chrF++ o menos, mucho menor que la mejora. Las dos direcciones no son comparables entre sí: el idioma de destino cambia la métrica.
+
+\begin{table}[!t]
+\caption{Resultados en la prueba (chrF++ y BLEU; media $\pm$ d. e. de 3 semillas)}
+\label{tab:resultados}
+\centering\small
+\adjustbox{max width=\columnwidth}{\begin{tabular}{lcccc}
+\toprule
+Sistema & chrF++ es$\rightarrow$qu & BLEU es$\rightarrow$qu & chrF++ qu$\rightarrow$es & BLEU qu$\rightarrow$es \\
+\midrule
+Sin ajustar (línea base) & 26.4 & 3.2 & 27.6 & 9.7 \\
+Ajustado, 25 \% de los datos & 34.9 & 7.9 & 31.5 & 13.0 \\
+Ajustado, 50 \% de los datos & 36.3 & 8.6 & 32.2 & 13.7 \\
+Ajustado, 100 \% (3 semillas) & 38.4 $\pm$ 0.4 & 9.8 $\pm$ 0.2 & 33.3 $\pm$ 0.1 & 14.7 $\pm$ 0.0 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+\subsection{Ablación del tamaño del entrenamiento}
+Con el 25 \%, el 50 \% y el 100 \% de los 49 414 pares, el chrF++ es$\rightarrow$qu pasa de 34.9 a 36.3 y a 38.4, y el qu$\rightarrow$es de 31.5 a 32.2 y a 33.3 (Tabla II). Cada duplicación de los datos aporta entre 0.7 y 2.1 puntos (la de 0.7 está cerca de la variación entre semillas), y la curva no se aplana en este rango, de modo que más datos de Ayacucho probablemente ayudarían. Cada punto de la ablación tiene una sola semilla; las diferencias de 1 punto o más superan la desviación observada (0.4) pero las menores no deben interpretarse. La Figura 1 muestra la pérdida de entrenamiento y el chrF++ de validación por época.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig_curvas.png}
+\caption{Pérdida de entrenamiento y chrF++ medio de validación por época.}
+\label{fig:curvas}
+\end{figure}
+\subsection{Interpretabilidad y análisis de errores}
+Analizamos las predicciones de la semilla 0 sobre toda la prueba. La Tabla III separa el chrF++ por longitud de la referencia. En es$\rightarrow$qu el chrF++ baja poco, de 40.2 en frases de 1 a 5 palabras a 37.3 en las de 11 a 20; en qu$\rightarrow$es baja de 38.1 a 32.7 en esos mismos tramos.
+
+\begin{table}[!t]
+\caption{chrF++ por longitud de la referencia (semilla 0)}
+\label{tab:longitud}
+\centering\small
+\adjustbox{max width=\columnwidth}{\begin{tabular}{lccc}
+\toprule
+Longitud & es$\rightarrow$qu & qu$\rightarrow$es & n por dirección \\
+\midrule
+1-5 palabras & 40.2 & 38.1 & 1103 \\
+6-10 palabras & 39.0 & 36.3 & 1020 \\
+11-20 palabras & 37.3 & 32.7 & 493 \\
+21-40 palabras & 40.5 & 31.7 & 44 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+Para ver dónde falla la morfología medimos, en es$\rightarrow$qu, cuántas palabras de la referencia con un sufijo dado aparecen idénticas en la salida (Tabla IV). Es una medida estricta: exige la palabra completa, y la traducción de referencia puede ser libre, así que un valor bajo no prueba por sí solo un error. Aun así, los sufijos que marcan relaciones (-manta, -wan, -paq) se reproducen mucho menos que -pa, lo que sugiere que la flexión es la parte más difícil.
+
+\begin{table}[!t]
+\caption{Recall de sufijos en es$\rightarrow$qu (palabra completa idéntica a la referencia)}
+\label{tab:sufijos}
+\centering\small
+\begin{tabular}{lcc}
+\toprule
+Sufijo & Apariciones & Recall \\
+\midrule
+-kuna & 341 & 23.5 \% \\
+-pa & 889 & 44.2 \% \\
+-manta & 430 & 10.7 \% \\
+-wan & 431 & 13.0 \% \\
+-pi & 696 & 23.7 \% \\
+-paq & 535 & 16.3 \% \\
+\bottomrule
+\end{tabular}
+\end{table}
+Revisamos además los casos de menor puntaje. Tres hallazgos: (i) 53 de 2 662 pares de prueba (2.0 \%) son encabezados, fechas o números de página (por ejemplo «PÁGINA 13»); sin ellos el chrF++ es 38.4 (es$\rightarrow$qu) y 33.0 (qu$\rightarrow$es), es decir, 0.3 puntos menos, así que no explican el promedio. (ii) Entre los peores casos restantes hay pares desalineados, con el quechua de una oración junto a la traducción de otra; no medimos su proporción. (iii) Hay fallas reales del modelo: 13 salidas es$\rightarrow$qu (0.49 \%) y 1 qu$\rightarrow$es repiten la misma palabra o tres palabras varias veces («sinchi sinchi sinchi…»).
+
+\subsection{Costo computacional}
+Los cinco entrenamientos (tres semillas y dos ablaciones) suman 1.58 horas de GPU, a las que se añaden 0.14 h de evaluación, en una NVIDIA RTX PRO 5000 Blackwell de 48 GB con bf16. Una corrida con todos los datos dura entre 0.41 y 0.43 h, con un pico de 19.5 GB de memoria de vídeo y lotes de 32. En el servidor, que solo tiene CPU, traducir una oración tarda unos 6 s (medido con tres peticiones). No ejecutamos el entrenamiento en una T4: su memoria de 16 GB queda por debajo de nuestro pico, por lo que habría que reducir el lote y usar fp16, algo que el script admite pero que no probamos. No estimamos la huella de carbono.
 
 \section{Discusión}
-\textbf{[PENDIENTE: se redacta con los resultados]}
+El ajuste fino funciona porque NLLB-200 ya conoce la etiqueta quy\_Latn \cite{r1}: con unas decenas de miles de pares adapta la ortografía y el vocabulario cotidiano, y el modelo sin ajustar ya alcanza 26–28 de chrF++. La ablación indica que el límite es el volumen de datos y no la capacidad del modelo, porque la curva sigue subiendo al pasar del 50 \% al 100 \%.
+
+Hay límites que acotan lo que decimos. Primero, la prueba sale de la misma fuente que el entrenamiento: el reparto sin fuga evita oraciones repetidas, pero no cambia el estilo, así que el resultado puede ser optimista para texto de otro origen. Segundo, el filtro de contenido religioso es una lista de palabras: es conservador, por lo que también descarta oraciones generales, y puede dejar pasar texto religioso sin esas palabras. Tercero, la prueba contiene pares desalineados que penalizan a todos los sistemas por igual y que no auditamos con un hablante. Cuarto, no comparamos con otros sistemas de forma directa: el chrF de 34.6 del ganador de 2021 \cite{r3,r4} viene de otra prueba. Quinto, ninguna persona hablante de quechua evaluó las traducciones, y en una lengua aglutinante una cifra de chrF++ no distingue un error de flexión de uno de sentido.
+
+Hay también un límite de variedad. Una prueba pequeña, con 24 fichas de cartillas escolares en quechua central, dio un chrF++ inferior al de la prueba de Ayacucho en ambas direcciones, lo que indica que el rendimiento cae fuera de la variedad de entrenamiento; no la incluimos entre los resultados porque la fuente tiene derechos reservados y no podemos redistribuirla, ni es una muestra grande.
+
+Sobre impacto y uso responsable: un traductor con este nivel de calidad puede ayudar a leer o redactar mensajes sencillos, pero puede inventar contenido (las repeticiones y los pares desalineados lo muestran) y no debe usarse para textos médicos, legales o administrativos sin revisión humana. El conjunto de datos procede en parte de publicaciones con derechos de autor y no declara licencia, y NLLB-200 se distribuye con licencia CC-BY-NC, por lo que el modelo es solo para uso no comercial. El servicio y la aplicación son prototipos y no se probaron con la comunidad hablante.
 
 \section{Conclusiones}
-\textbf{[PENDIENTE: se redacta con los resultados]}
+Un solo NLLB-200 ajustado con 49 414 pares no religiosos de quechua ayacuchano traduce en ambos sentidos con 38.4 (es$\rightarrow$qu) y 33.3 (qu$\rightarrow$es) de chrF++, unos 12 y 6 puntos más que sin ajustar, con resultados estables entre semillas y mejoras que crecen con el tamaño del entrenamiento. La limpieza y el reparto sin fuga fueron necesarios para poder medir algo.
+
+Como trabajo futuro: (1) evaluar en pruebas externas, como FLORES-200 con quy\_Latn y los conjuntos de AmericasNLP, que provienen de otras fuentes; (2) revisar con un hablante una muestra de la prueba para medir los pares desalineados; (3) reducir las repeticiones con restricciones de decodificación y medir el efecto; (4) entrenar con adaptadores (LoRA) para que quepa en una T4; y (5) añadir más texto de Ayacucho de otras fuentes, ya que la ablación sugiere que el modelo sigue mejorando con más datos.
 
 \section*{Contribuciones}
 \begin{tabular}{@{}p{0.32\columnwidth}p{0.6\columnwidth}@{}}
@@ -124,19 +199,19 @@ Sergio Mondragon Contreras & (por completar por el equipo) \\
 Código, configuraciones y resultados: repositorio del proyecto (etiqueta v1.0-final). Los pesos del mejor modelo se publican con el enlace indicado en el README. El modelo base NLLB-200 tiene licencia CC-BY-NC 4.0, por lo que el modelo ajustado se limita a uso no comercial. Se usó Claude Code (Anthropic) para escribir y depurar los scripts de limpieza, entrenamiento y análisis, el servicio, la aplicación Android y los borradores de redacción. El equipo ejecutó los experimentos y revisó los textos; todas las cifras provienen de esas ejecuciones.
 
 \begin{thebibliography}{99}
-\bibitem{r1} NLLB Team, "No language left behind: Scaling human-centered machine translation," arXiv:2207.04672, 2022.
-\bibitem{r2} A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin, "Attention is all you need," in Advances in Neural Information Processing Systems (NeurIPS), vol. 30, 2017.
-\bibitem{r3} O. Moreno, "The REPUcs' Spanish–Quechua submission to the AmericasNLP 2021 shared task on open machine translation," in Proc. 1st Workshop on NLP for Indigenous Languages of the Americas, 2021, pp. 241–247.
-\bibitem{r4} N. Ahmed, N. Flechas Manrique, and A. Petrović, "Enhancing Spanish-Quechua machine translation with pre-trained models and diverse data sources: LCT-EHU at AmericasNLP shared task," in Proc. AmericasNLP Workshop, 2023, pp. 156–162.
-\bibitem{r5} J. Asillo Congora, J. Santisteban, and R. Lazo Vasquez, "UCSP submission to the AmericasNLP 2025 shared task," in Proc. 5th Workshop on NLP for Indigenous Languages of the Americas, 2025, pp. 84–91.
-\bibitem{r6} W.-R. Chen and M. Abdul-Mageed, "Improving neural machine translation of indigenous languages with multilingual transfer learning," arXiv:2205.06993, 2022.
-\bibitem{r7} M. Mager, R. Bhatnagar, G. Neubig, N. T. Vu, and K. Kann, "Neural machine translation for the indigenous languages of the Americas: An introduction," arXiv:2306.06804, 2023.
-\bibitem{r8} A. L. Tonja, F. Balouchzahi, S. Butt, O. Kolesnikova, H. Ceballos, A. Gelbukh, and T. Solorio, "NLP progress in indigenous Latin American languages," arXiv:2404.05365, 2024.
-\bibitem{r9} B. Cueva Medina, G. F. Tuco Casquino, and J. Sulla-Torres, "Development of a neural machine translation model optimized with BERT for translation from Quechua to Spanish," in 22nd LACCEI Int. Multi-Conf. for Engineering, Education, and Technology, 2024.
-\bibitem{r10} J. E. Ortega, R. Castro Mamani, and K. Cho, "Neural machine translation with a polysynthetic low resource language," Machine Translation, 2020, doi: 10.1007/s10590-020-09255-9.
-\bibitem{r11} Ž. Agić and I. Vulić, "publicaciones de una sola organización: A wide-coverage parallel corpus for low-resource languages," in Proc. 57th Annual Meeting of the ACL, 2019.
-\bibitem{r12} M. Popović, "chrF++: words helping character n-grams," in Proc. 2nd Conf. on Machine Translation (WMT), 2017, pp. 612–618.
-\bibitem{r13} M. Post, "A call for clarity in reporting BLEU scores," in Proc. 3rd Conf. on Machine Translation (WMT), 2018, pp. 186–191.
-\bibitem{r14} I. Loshchilov and F. Hutter, "Decoupled weight decay regularization," in Proc. Int. Conf. on Learning Representations (ICLR), 2019.
+\bibitem{r1} NLLB Team, “No language left behind: Scaling human-centered machine translation,” arXiv:2207.04672, 2022.
+\bibitem{r2} A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin, “Attention is all you need,” in Advances in Neural Information Processing Systems (NeurIPS), vol. 30, 2017.
+\bibitem{r3} O. Moreno, “The REPUcs' Spanish–Quechua submission to the AmericasNLP 2021 shared task on open machine translation,” in Proc. 1st Workshop on NLP for Indigenous Languages of the Americas, 2021, pp. 241–247.
+\bibitem{r4} N. Ahmed, N. Flechas Manrique, and A. Petrović, “Enhancing Spanish-Quechua machine translation with pre-trained models and diverse data sources: LCT-EHU at AmericasNLP shared task,” in Proc. AmericasNLP Workshop, 2023, pp. 156–162.
+\bibitem{r5} J. Asillo Congora, J. Santisteban, and R. Lazo Vasquez, “UCSP submission to the AmericasNLP 2025 shared task,” in Proc. 5th Workshop on NLP for Indigenous Languages of the Americas, 2025, pp. 84–91.
+\bibitem{r6} W.-R. Chen and M. Abdul-Mageed, “Improving neural machine translation of indigenous languages with multilingual transfer learning,” arXiv:2205.06993, 2022.
+\bibitem{r7} M. Mager, R. Bhatnagar, G. Neubig, N. T. Vu, and K. Kann, “Neural machine translation for the indigenous languages of the Americas: An introduction,” arXiv:2306.06804, 2023.
+\bibitem{r8} A. L. Tonja, F. Balouchzahi, S. Butt, O. Kolesnikova, H. Ceballos, A. Gelbukh, and T. Solorio, “NLP progress in indigenous Latin American languages,” arXiv:2404.05365, 2024.
+\bibitem{r9} B. Cueva Medina, G. F. Tuco Casquino, and J. Sulla-Torres, “Development of a neural machine translation model optimized with BERT for translation from Quechua to Spanish,” in 22nd LACCEI Int. Multi-Conf. for Engineering, Education, and Technology, 2024.
+\bibitem{r10} J. E. Ortega, R. Castro Mamani, and K. Cho, “Neural machine translation with a polysynthetic low resource language,” Machine Translation, 2020, doi: 10.1007/s10590-020-09255-9.
+\bibitem{r11} Ž. Agić and I. Vulić, “publicaciones de una sola organización: A wide-coverage parallel corpus for low-resource languages,” in Proc. 57th Annual Meeting of the ACL, 2019.
+\bibitem{r12} M. Popović, “chrF++: words helping character n-grams,” in Proc. 2nd Conf. on Machine Translation (WMT), 2017, pp. 612–618.
+\bibitem{r13} M. Post, “A call for clarity in reporting BLEU scores,” in Proc. 3rd Conf. on Machine Translation (WMT), 2018, pp. 186–191.
+\bibitem{r14} I. Loshchilov and F. Hutter, “Decoupled weight decay regularization,” in Proc. Int. Conf. on Learning Representations (ICLR), 2019.
 \end{thebibliography}
 \end{document}

@@ -25,6 +25,8 @@ def bloques() -> list[tuple]:
 
 # ---------------------------------------------------------------- LaTeX
 def esc(t: str) -> str:
+    # Con babel-spanish, la comilla recta " es un atajo (ª, ñ...) y rompe el texto: se convierte a comillas de LaTeX.
+    t = re.sub(r'"([^"]*)"', lambda m: "“" + m.group(1) + "”", t)
     t = t.replace("\\", r"\textbackslash{}")
     for a, b in (("&", r"\&"), ("%", r"\%"), ("$", r"\$"), ("#", r"\#"), ("_", r"\_")):
         t = t.replace(a, b)
@@ -53,8 +55,10 @@ def tex_bloque(b: tuple) -> str:
         _, etq, tit, cab, filas = b
         col = "l" + "c" * (len(cab) - 1)
         cuerpo = "\n".join(" & ".join(esc(str(c)) for c in f) + r" \\" for f in filas)
-        return (f"\\begin{{table}}[!t]\n\\caption{{{esc(tit)}}}\n\\label{{{etq}}}\n\\centering\\small\n\\begin{{tabular}}{{{col}}}\n\\toprule\n"
-                f"{' & '.join(esc(c) for c in cab)} \\\\\n\\midrule\n{cuerpo}\n\\bottomrule\n\\end{{tabular}}\n\\end{{table}}\n")
+        tabla = (f"\\begin{{tabular}}{{{col}}}\n\\toprule\n{' & '.join(esc(c) for c in cab)} \\\\\n\\midrule\n{cuerpo}\n\\bottomrule\n\\end{{tabular}}")
+        if len(cab) > 3:  # tablas anchas: se escalan al ancho de la columna para que no se superpongan
+            tabla = f"\\adjustbox{{max width=\\columnwidth}}{{{tabla}}}"
+        return f"\\begin{{table}}[!t]\n\\caption{{{esc(tit)}}}\n\\label{{{etq}}}\n\\centering\\small\n{tabla}\n\\end{{table}}\n"
     if k == "fig":
         _, ruta, tit, etq = b
         return f"\\begin{{figure}}[!t]\n\\centering\n\\includegraphics[width=\\columnwidth]{{{Path(ruta).name}}}\n\\caption{{{esc(tit)}}}\n\\label{{{etq}}}\n\\end{{figure}}\n"
@@ -82,7 +86,7 @@ def construir_tex(bl: list[tuple]) -> str:
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[spanish,es-tabla]{babel}
-\usepackage{amsmath,booktabs,graphicx,cite}
+\usepackage{amsmath,booktabs,graphicx,cite,adjustbox}
 \usepackage{microtype}
 \hyphenation{aglu-ti-nan-te}
 \renewcommand{\IEEEkeywordsname}{Palabras clave}
@@ -207,6 +211,12 @@ def construir_docx(bl: list[tuple], destino: Path) -> None:
             par(b[2].upper(), WD_ALIGN_PARAGRAPH.CENTER, tam=8, despues=2)
             t = d.add_table(rows=1 + len(b[4]), cols=len(b[3]))
             t.alignment = WD_TABLE_ALIGNMENT.CENTER
+            t.autofit = False
+            primera = Cm(3.4) if len(b[3]) > 3 else Cm(2.8)
+            resto = int((Cm(8.6) - primera) / max(len(b[3]) - 1, 1))
+            for fila_t in t.rows:
+                for j, cel in enumerate(fila_t.cells):
+                    cel.width = primera if j == 0 else resto
             for j, h in enumerate(b[3]):
                 t.cell(0, j).paragraphs[0].add_run(h).bold = True
             for i, f in enumerate(b[4], 1):

@@ -1,0 +1,115 @@
+{
+  "n_pares": 2662,
+  "n_ruido": 53,
+  "por_direccion": {
+    "es->qu": {
+      "chrf_completo": 38.7,
+      "chrf_sin_ruido": 38.4,
+      "chrf_solo_ruido": 62.2,
+      "n_sin_ruido": 2609,
+      "repeticiones": 13,
+      "por_longitud": {
+        "1-5": {
+          "chrf": 40.2,
+          "n": 1103
+        },
+        "6-10": {
+          "chrf": 39.0,
+          "n": 1020
+        },
+        "11-20": {
+          "chrf": 37.3,
+          "n": 493
+        },
+        "21-40": {
+          "chrf": 40.5,
+          "n": 44
+        },
+        ">40": {
+          "chrf": 26.2,
+          "n": 2
+        }
+      },
+      "sufijos": {
+        "kuna": {
+          "n": 341,
+          "recall": 23.5
+        },
+        "pa": {
+          "n": 889,
+          "recall": 44.2
+        },
+        "manta": {
+          "n": 430,
+          "recall": 10.7
+        },
+        "wan": {
+          "n": 431,
+          "recall": 13.0
+        },
+        "man": {
+          "n": 341,
+          "recall": 17.3
+        },
+        "pi": {
+          "n": 696,
+          "recall": 23.7
+        },
+        "paq": {
+          "n": 535,
+          "recall": 16.3
+        },
+        "mi": {
+          "n": 817,
+          "recall": 15.8
+        },
+        "taq": {
+          "n": 228,
+          "recall": 32.5
+        },
+        "chik": {
+          "n": 325,
+          "recall": 23.1
+        },
+        "ku": {
+          "n": 710,
+          "recall": 15.2
+        },
+        "sqa": {
+          "n": 219,
+          "recall": 27.4
+        }
+      }
+    },
+    "qu->es": {
+      "chrf_completo": 33.3,
+      "chrf_sin_ruido": 33.0,
+      "chrf_solo_ruido": 63.2,
+      "n_sin_ruido": 2609,
+      "repeticiones": 1,
+      "por_longitud": {
+        "1-5": {
+          "chrf": 38.1,
+          "n": 621
+        },
+        "6-10": {
+          "chrf": 36.3,
+          "n": 665
+        },
+        "11-20": {
+          "chrf": 32.7,
+          "n": 996
+        },
+        "21-40": {
+          "chrf": 31.7,
+          "n": 369
+        },
+        ">40": {
+          "chrf": 35.4,
+          "n": 11
+        }
+      },
+      "sufijos": {}
+    }
+  }
+}
