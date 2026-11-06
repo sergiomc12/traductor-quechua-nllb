@@ -20,3 +20,5 @@ paper/*.aux
 paper/*.log
 paper/*.out
 paper/__pycache__/
+build/
+keystore.pass

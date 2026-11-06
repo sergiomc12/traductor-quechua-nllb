@@ -1,0 +1,47 @@
+{
+  "args": {
+    "nombre": "ablacion_datos50_s0",
+    "semilla": "0",
+    "epocas": "3",
+    "batch": "32",
+    "lr": "3e-05",
+    "warmup": "0.05",
+    "frac_datos": "0.5",
+    "n_valid": "500",
+    "n_test": "0",
+    "precision": "auto",
+    "max_pasos": "0",
+    "guardar_pesos": "False"
+  },
+  "precision": "torch.bfloat16",
+  "gpu": "NVIDIA RTX PRO 5000 Blackwell",
+  "pico_vram_gb": 19.5,
+  "horas_gpu_entrenamiento": 0.203,
+  "horas_gpu_test": 0.029,
+  "mejor_chrF++_medio_valid": 35.4,
+  "historial": [
+    {
+      "epoca": 1,
+      "loss": 2.3636,
+      "chrF++_es->qu": 35.8,
+      "chrF++_qu->es": 32.3,
+      "t_s": 246,
+      "mejor": true
+    },
+    {
+      "epoca": 2,
+      "loss": 2.0605,
+      "chrF++_es->qu": 37.3,
+      "chrF++_qu->es": 33.5,
+      "t_s": 489,
+      "mejor": true
+    },
+    {
+      "epoca": 3,
+      "loss": 1.9537,
+      "chrF++_es->qu": 37.2,
+      "chrF++_qu->es": 33.4,
+      "t_s": 732
+    }
+  ]
+}

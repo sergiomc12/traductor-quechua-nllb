@@ -9,6 +9,8 @@ PUTTY="/c/Program Files/PuTTY"
 OPC=(-batch -pw "$PASSWORD_REMOTE_HOST")
 DEST="$USERNAME_REMOTE_HOST@$IP_REMOTE_HOST"
 
-tar -czf /tmp/quechua_paquete.tgz src/__init__.py src/servicio deploy models/principal_s0/mejor
-"$PUTTY/pscp.exe" "${OPC[@]}" /tmp/quechua_paquete.tgz deploy/instalar_en_servidor.sh "$DEST:/tmp/"
+mkdir -p build
+export MSYS_NO_PATHCONV=1
+tar -czf build/quechua_paquete.tgz src/__init__.py src/servicio deploy models/principal_s0/mejor
+"$PUTTY/pscp.exe" "${OPC[@]}" build/quechua_paquete.tgz deploy/instalar_en_servidor.sh "$DEST:/tmp/"
 "$PUTTY/plink.exe" "${OPC[@]}" "$DEST" "DOMINIO=$DOMINIO EMAIL=$EMAIL bash /tmp/instalar_en_servidor.sh"
