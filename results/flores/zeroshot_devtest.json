@@ -1,0 +1,20 @@
+{
+  "es->qu": {
+    "chrF++": 21.5,
+    "BLEU": 1.4,
+    "repeticiones": 211,
+    "n": 1012
+  },
+  "qu->es": {
+    "chrF++": 28.4,
+    "BLEU": 8.0,
+    "repeticiones": 41,
+    "n": 1012
+  },
+  "_config": {
+    "modelo": "facebook/nllb-200-distilled-600M",
+    "split": "devtest",
+    "beams": 4,
+    "segundos": 299
+  }
+}

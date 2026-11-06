@@ -1,0 +1,20 @@
+{
+  "es->qu": {
+    "chrF++": 25.0,
+    "BLEU": 1.8,
+    "repeticiones": 54,
+    "n": 997
+  },
+  "qu->es": {
+    "chrF++": 29.0,
+    "BLEU": 7.8,
+    "repeticiones": 26,
+    "n": 997
+  },
+  "_config": {
+    "modelo": "models/principal_s0/mejor",
+    "split": "dev",
+    "beams": 4,
+    "segundos": 405
+  }
+}

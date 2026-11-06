@@ -47,6 +47,7 @@ def parsear_args() -> argparse.Namespace:
     p.add_argument("--lr", type=float, default=3e-5)
     p.add_argument("--warmup", type=float, default=0.05)
     p.add_argument("--frac-datos", type=float, default=1.0, help="fraccion del entrenamiento a usar (ablacion de tamano)")
+    p.add_argument("--train-archivo", default="train", help="nombre (sin .tsv) del entrenamiento en data/limpio/ayacucho_general; 'train' es el original")
     p.add_argument("--n-valid", type=int, default=500)
     p.add_argument("--n-test", type=int, default=0, help="0 = test completo")
     p.add_argument("--precision", choices=["auto", "bf16", "fp16"], default="auto")
@@ -66,8 +67,8 @@ def leer(split: str) -> pd.DataFrame:
     return pd.read_csv(RAIZ / "data" / "limpio" / "ayacucho_general" / f"{split}.tsv", sep="	", keep_default_na=False)
 
 
-def cargar_train(frac: float, semilla: int) -> pd.DataFrame:
-    df = leer("train")
+def cargar_train(frac: float, semilla: int, archivo: str = "train") -> pd.DataFrame:
+    df = leer(archivo)
     return df.sample(frac=frac, random_state=semilla).reset_index(drop=True)
 
 
@@ -151,7 +152,7 @@ def main() -> None:
     carpeta_mod = RAIZ / "models" / args.nombre
     carpeta_res.mkdir(parents=True, exist_ok=True)
 
-    train = cargar_train(args.frac_datos, args.semilla)
+    train = cargar_train(args.frac_datos, args.semilla, args.train_archivo)
     valid_all = leer("valid")
     valid = valid_all.sample(min(args.n_valid, len(valid_all)), random_state=args.semilla)
     test = leer("test")
