@@ -53,5 +53,5 @@ def traducir(p: Peticion) -> dict:
     tok.src_lang = CODIGOS[p.origen]
     enc = tok(p.texto, return_tensors="pt", truncation=True, max_length=MAX_LEN).to(estado["dispositivo"])
     with torch.inference_mode():
-        gen = modelo.generate(**enc, forced_bos_token_id=tok.convert_tokens_to_ids(CODIGOS[p.destino]), num_beams=4, max_new_tokens=MAX_LEN)
+        gen = modelo.generate(**enc, forced_bos_token_id=tok.convert_tokens_to_ids(CODIGOS[p.destino]), num_beams=4, no_repeat_ngram_size=3, max_new_tokens=MAX_LEN)
     return {"traduccion": tok.batch_decode(gen, skip_special_tokens=True)[0], "origen": p.origen, "destino": p.destino}
