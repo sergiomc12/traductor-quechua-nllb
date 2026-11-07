@@ -66,16 +66,17 @@ def secciones_previas() -> list[tuple]:
         ("p", "Los conjuntos públicos disponibles en Hugging Face tienen problemas que cambian los números reportados. "
               "En el conjunto de Ayacucho, el 7.3 % de las oraciones en español de validación y el 6.9 % de las de prueba ya estaban en entrenamiento. "
               "Más de la mitad de las filas tienen el estilo de esas publicaciones. "
-              "Y hay duplicados y pares mal alineados. Un traductor entrenado con ese material aprende sobre todo el estilo de esas publicaciones, "
+              "También hay duplicados y pares mal alineados. Un traductor entrenado con ese material aprende sobre todo el estilo de esas publicaciones, "
               "y un promedio global sobre su conjunto de prueba no dice cuánto traduce fuera de él."),
-        ("p", "Nuestra decisión fue excluir ese texto del entrenamiento, la validación y la prueba, y entrenar solo con lo que queda: 49 414 pares de entrenamiento. "
+        ("p", "Decidimos excluir ese material del entrenamiento, la validación y la prueba, y entrenar solo con lo que queda: 49 414 pares de entrenamiento. "
               "Es menos de la mitad de los datos, así que medimos también cuánto aporta el tamaño del conjunto."),
         ("p", "Las contribuciones son:"),
         ("bullets", [
-            "Un conjunto de 122 802 pares español–quechua ayacuchano, limpiado y sin fuga entre particiones, y su subconjunto sin ese texto de 55 553 pares (49 414, 3 477 y 2 662 en entrenamiento, validación y prueba).",
-            "Un modelo bidireccional, NLLB-200 de 600 millones de parámetros ajustado con tres semillas y comparado con el mismo modelo sin ajustar.",
-            "Una ablación sobre el tamaño del entrenamiento (25 %, 50 % y 100 % de los datos).",
-            "Un análisis de errores por longitud y sufijos, y el servicio y la aplicación Android que usan el modelo.",
+            "Un conjunto de 122 802 pares español–quechua ayacuchano, limpiado y sin fuga entre particiones, y su subconjunto sin esas publicaciones, de 55 553 pares (49 414, 3 477 y 2 662 en entrenamiento, validación y prueba).",
+            "Un modelo bidireccional, NLLB-200 de 600 millones de parámetros ajustado con tres semillas y comparado con el mismo modelo sin ajustar, y una ablación sobre el tamaño del entrenamiento (25 %, 50 % y 100 %).",
+            "La comparación de diez modelos (selección de datos, retrotraducción, ciclo automático y conjunto normalizado) en la prueba propia, en FLORES-200 y en un examen de concordancia verbal.",
+            "Un conjunto normalizado de verbos y léxico y el examen de concordancia, con el que el modelo final conjuga mejor verbos nuevos sin perder en la prueba.",
+            "Un análisis de errores por longitud y sufijos, la dificultad del apóstrofo y de la voz, y el servicio y la aplicación Android que usan el modelo.",
         ]),
         ("p", "La Sección II resume trabajos previos, la III describe datos y método, la IV presenta los resultados, la V los discute y la VI concluye."),
 
@@ -89,23 +90,23 @@ def secciones_previas() -> list[tuple]:
               "y fijaron el estado del arte en cinco de los diez pares sin ampliar los datos de entrenamiento. Mager et al. [7] y Tonja et al. [8] resumen el estado del área y sus carencias de datos."),
         ("p", "Quechua a español. Ortega et al. [10] tradujeron del quechua al español con un modelo neuronal para una lengua polisintética y segmentación BPE guiada por sufijos. "
               "Cueva et al. [9] usaron un Transformer con LMfusion y segmentación PRPE, y construyeron una interfaz web de traducción."),
-        ("p", "Este trabajo se diferencia en tres puntos. Parte de una auditoría de los datos abiertos y reparte las particiones sin fuga. "
-              "Excluye ese texto del entrenamiento y de la evaluación, y mide cuánto aporta el tamaño del conjunto que queda. "
-              "Y entrega un modelo en ambos sentidos con servicio y aplicación, no solo una tabla de métricas."),
+        ("p", "Este trabajo se diferencia de los anteriores. Parte de una auditoría de los datos abiertos y reparte las particiones sin fuga. "
+              "Excluye esas publicaciones del entrenamiento y de la evaluación, y mide cuánto aporta el tamaño del conjunto que queda. "
+              "Además entrega un modelo en ambos sentidos, con servicio y aplicación."),
 
         ("sec", "Metodología"),
         ("sub", "Datos"),
         ("p", "Usamos el conjunto spanish-to-quechua del hackathon SomosNLP 2022 en Hugging Face, variedad Ayacucho, con columnas es y qu. "
-              "Reúne blogs, Tatoeba, datos de AmericasNLP 2021 y publicaciones de una sola organización. No declara licencia; la parte que proviene de esas publicaciones tiene derechos de autor, y lo que queda tras el filtro puede seguir incluyendo texto de esa fuente, como se discute en la Sección V. "
+              "Reúne blogs, Tatoeba, datos de AmericasNLP 2021 y publicaciones de una sola organización. No declara licencia; la parte que proviene de esas publicaciones tiene derechos de autor, y lo que queda tras el filtro puede seguir incluyendo texto de esas publicaciones, como se discute en la Sección V. "
               "Descartamos el conjunto de Cusco, también en Hugging Face, porque el quechua es una familia de variedades con inteligibilidad limitada entre las lejanas, en [4] añadir datos de Cusco ayudó menos que añadir datos de Ayacucho, y NLLB solo tiene la etiqueta de Ayacucho."),
         ("p", "La limpieza une las particiones originales, aplica los filtros de la Tabla I y reparte de nuevo por grupos: "
               "todas las filas que comparten una oración en español o en quechua van a la misma partición, elegida con un hash del grupo. "
               "Después de esto, ninguna oración en español ni en quechua aparece en dos particiones. "
-              "Cada fila se marca como de ese dominio o no. Un primer filtro de cinco palabras (Dios, Jehová, Biblia, Jesús, Cristo) marcó el 34.0 % de las filas, pero una revisión de muestras mostró que dejaba pasar texto del mismo tipo: vocabulario de las revistas (congregación, predicar, adoración), citas como (Is. 55: 9), nombres bíblicos y formas quechuas con sufijos como Diospa. "
-              "El filtro final amplía la lista con ese vocabulario y con patrones de cita, y busca en ambos idiomas. Es conservador: ante la duda marca la fila como de ese tipo, y por eso descarta también algunas oraciones generales con palabras como alma o Padre, y puede dejar algo de texto de ese tipo sin detectar. "
+              "Cada fila se marca como proveniente de esas publicaciones o no. Un primer filtro de cinco palabras (Dios, Jehová, Biblia, Jesús, Cristo) marcó el 34.0 % de las filas, pero una revisión de muestras mostró que dejaba pasar material de las mismas publicaciones: vocabulario de las revistas (congregación, predicar, adoración), citas como (Is. 55: 9), nombres bíblicos y formas quechuas con sufijos como Diospa. "
+              "El filtro final amplía la lista con ese vocabulario y con patrones de cita, y busca en ambos idiomas. Es conservador: ante la duda marca la fila como proveniente de ellas, y por eso descarta también algunas oraciones generales con palabras como alma o Padre, y puede dejar algo sin detectar. "
               "Marca el 55.0 % del entrenamiento, el 49.4 % de la validación y el 56.5 % de la prueba. Esas filas se excluyen de todas las particiones."),
         ("table", "tab:limpieza", "Resumen de la limpieza (variedad Ayacucho)", ["Paso", "Filas"], [list(f) for f in DESCARTES]),
-        ("p", "Antes de excluir ese texto las particiones tenían 109 807, 6 877 y 6 118 pares. Después quedan 49 414 de entrenamiento, 3 477 de validación y 2 662 de prueba (Tabla II)."),
+        ("p", "Antes del filtro las particiones tenían 109 807, 6 877 y 6 118 pares. Después quedan 49 414 de entrenamiento, 3 477 de validación y 2 662 de prueba (Tabla II)."),
         ("table", "tab:particion", "Particiones antes y después del filtro de dominio",
          ["Partición", "Pares limpios", "Tras el filtro", "Excluido"],
          [["Entrenamiento", "109 807", "49 414", "55.0 %"], ["Validación", "6 877", "3 477", "49.4 %"],
@@ -143,7 +144,7 @@ def secciones_previas() -> list[tuple]:
               "variantes de escritura tratadas como equivalentes (por ejemplo chaki y ch'aki) y sinónimos en español. "
               "Las filas dudosas o sin sentido se marcaron para revisión manual y no entran al entrenamiento. Resultan 25 181 filas, de las que usamos 15 373 (15k) o 2 679 (2k). "
               "Las reglas siguen el paradigma de Cusco y Chanka, que no validó ninguna persona hablante."),
-        ("p", "Para medir si el modelo aprende la conjugación, y no solo memoriza, el examen de concordancia usa cinco verbos que no están en el conjunto normalizado (raíces llamka, waqa, sama, kawsa y qillqa)"
+        ("p", "Para medir si el modelo aprende la conjugación, y no solo memoriza, el examen de concordancia usa cinco verbos que no están en el conjunto normalizado (raíces llamka, waqa, sama, kawsa y qillqa) "
               "en las siete personas y tres tiempos. Cuenta un acierto cuando la forma verbal esperada aparece en la salida: 105 casos en es→qu y 95 en qu→es. "
               "La forma esperada sale de las mismas reglas, así que el examen mide si el modelo aprendió ese paradigma, no si coincide con el quechua ayacuchano estándar."),
     ]

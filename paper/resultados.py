@@ -106,16 +106,15 @@ def resumen() -> str:
     return (
         "El quechua ayacuchano tiene pocos textos paralelos con el español, y los conjuntos públicos mezclan duplicados, fuga entre particiones y mucho texto de publicaciones de una sola organización. "
         "Ajustamos NLLB-200 de 600 millones de parámetros como un solo modelo bidireccional español–quechua. Limpiamos y repartimos sin fuga 122 802 pares públicos, "
-        "excluimos el 55 % que un filtro léxico asocia a ese tipo de texto y entrenamos con 49 414 pares. "
-        f"En una prueba de 2 662 pares sin ese texto, tres semillas dan un chrF++ de {_pm(*e)} (es→qu) y {_pm(*q)} (qu→es), frente a {s['base']['es->qu']['chrF++']} y {s['base']['qu->es']['chrF++']} "
+        "excluimos el 55 % que un filtro léxico asocia a esas publicaciones y entrenamos con 49 414 pares. "
+        f"En una prueba de 2 662 pares ajenos a esas publicaciones, tres semillas dan un chrF++ de {_pm(*e)} (es→qu) y {_pm(*q)} (qu→es), frente a {s['base']['es->qu']['chrF++']} y {s['base']['qu->es']['chrF++']} "
         f"del mismo modelo sin ajustar, y un BLEU de {be[0]:.1f} y {bq[0]:.1f}. "
         f"Entrenar con el 25 %, el 50 % y el 100 % de los datos sube el chrF++ es→qu de {s['abl'][25]['es->qu']['chrF++']} a {s['abl'][50]['es->qu']['chrF++']} y a {e[0]:.1f}. "
-        "Comparamos diez modelos. Los cambios en la selección de datos y la retrotraducción no mueven la prueba propia más de un punto. "
+        "Comparamos diez modelos. Seleccionar datos o añadir retrotraducción no mueve la prueba propia más de un punto. "
         "Añadir un conjunto normalizado de verbos y léxico mantiene esa prueba y sube el acierto en la conjugación de verbos nuevos de 24.8 % a 57.1 % (es→qu) y de 53.7 % a 82.1 % (qu→es), "
         "por lo que es el modelo final. "
-        f"El 0.5 % de las salidas es→qu cae en repeticiones. "
-        f"Los cinco entrenamientos suman {h:.1f} horas en una GPU de 48 GB. El modelo está desplegado como servicio web y aplicación Android. "
-        "La prueba proviene de la misma fuente que el entrenamiento y no se validó con hablantes, así que los números no miden el uso real."
+        f"Los cinco entrenamientos principales suman {h:.1f} horas y el proyecto completo, unas 13 horas de entrenamiento en una GPU de 48 GB. El modelo se sirve en una web y una aplicación Android. "
+        "La prueba viene de la misma fuente del entrenamiento y ningún hablante la validó."
     )
 
 
@@ -130,6 +129,7 @@ def bloques() -> list[tuple]:
     horas = {k: v["horas_gpu_entrenamiento"] for k, v in s["horas"].items()}
     t4, t4h = _j("t4_emulada_s0", "test.json"), _j("t4_emulada_s0", "historial.json")
     h_tot = sum(horas.values())
+    h_all = sum(_j(p.parent.name, 'historial.json')['horas_gpu_entrenamiento'] for p in RES.glob('*/historial.json'))
     h_test = sum(v["horas_gpu_test"] for v in s["horas"].values())
     pico = max(v["pico_vram_gb"] for v in s["horas"].values())
     pct_ruido = 100 * err["n_ruido"] / err["n_pares"]
@@ -171,9 +171,11 @@ def bloques() -> list[tuple]:
               f"Con el conjunto normalizado el acierto sube a {comp[8][5]} % y {comp[8][6]} % (15k) y a {comp[7][5]} % y {comp[7][6]} % (2k). "
               f"Con tres semillas el 15k da {_pm(s15['es->qu'][2], s15['es->qu'][3])} % y {_pm(s15['qu->es'][2], s15['qu->es'][3])} %, y el 2k da {_pm(s2k['es->qu'][2], s2k['es->qu'][3])} % y {_pm(s2k['qu->es'][2], s2k['qu->es'][3])} %, "
               f"sin pérdida en la prueba propia (15k: {_pm(s15['es->qu'][0], s15['es->qu'][1])} y {_pm(s15['qu->es'][0], s15['qu->es'][1])} de chrF++). "
-              "Un conjunto de solo 2 679 filas rinde igual que uno de 15 373, de modo que lo que aporta es la cobertura de conjugaciones y no el volumen."),
-        ("p", f"Elegimos el 15k (semilla 0) como modelo final por tres razones: tiene el mejor resultado en la prueba propia en qu→es ({comp[8][2]}) y empata el mejor en es→qu ({comp[8][1]}), "
-              f"es el que más acierta en la concordancia qu→es ({comp[8][6]} %) y en FLORES queda a {abs(float(comp[1][3]) - float(comp[8][3])):.1f} puntos del principal en es→qu y a {abs(float(comp[1][4]) - float(comp[8][4])):.1f} por encima en qu→es. "
+              "Un conjunto de solo 2 679 filas rinde igual que uno de 15 373, así que la mejora viene de cubrir conjugaciones, con independencia del volumen."),
+        ("p", f"Como modelo final tomamos el 15k con la semilla 0. No lo elegimos por una diferencia en la prueba, porque entre variantes y semillas esas diferencias (±0.3) están dentro del ruido: "
+              f"la cifra que reportamos es la media de tres semillas, {_pm(s15['es->qu'][0], s15['es->qu'][1])} y {_pm(s15['qu->es'][0], s15['qu->es'][1])}. "
+              f"Lo que decide es el examen de concordancia, una prueba aparte, en la que el 15k acierta {comp[8][6]} % en qu→es y {comp[8][5]} % en es→qu; en FLORES queda a {abs(float(comp[1][3]) - float(comp[8][3])):.1f} puntos del principal en es→qu y a {abs(float(comp[1][4]) - float(comp[8][4])):.1f} por encima en qu→es. "
+              "Entre las tres semillas del 15k, la semilla 0 fue la de mejor prueba, así que su cifra individual es algo optimista; por eso preferimos la media. "
               f"No gana en todo: el ciclo automático obtiene {comp[6][3]} y {comp[6][4]} en FLORES, frente a {comp[8][3]} y {comp[8][4]}, pero usó pares de FLORES dev como entrenamiento, "
               "y por eso su cifra en FLORES no es comparable, y su concordancia es menor. Con literatura quechua central (138 pares) la concordancia sube en es→qu y baja en qu→es y la prueba propia baja entre 0.2 y 0.3 puntos. "
               "En 21 pares de literatura central reservados, el chrF++ qu→es sube de 26.4 a 28.3 y el es→qu baja de 21.1 a 20.1, una muestra demasiado pequeña y de una sola semilla para concluir algo, por lo que no la adoptamos. "
@@ -201,19 +203,19 @@ def bloques() -> list[tuple]:
               "Es una medida estricta: exige la palabra completa, y la traducción de referencia puede ser libre, así que un valor bajo no prueba por sí solo un error. "
               "Aun así, los sufijos que marcan relaciones (-manta, -wan, -paq) se reproducen mucho menos que -pa, lo que sugiere que la flexión es la parte más difícil."),
         ("table", "tab:sufijos", "Recall de sufijos en es→qu (palabra completa idéntica a la referencia)", ["Sufijo", "Apariciones", "Recall"], suf_filas),
-        ("p", f"Revisamos también los casos de menor puntaje. Tres hallazgos: (i) {err['n_ruido']} de {_n(err['n_pares'])} pares de prueba ({pct_ruido:.1f} %) son encabezados, fechas o números de página "
+        ("p", f"Revisamos también los casos de menor puntaje. Encontramos lo siguiente: (i) {err['n_ruido']} de {_n(err['n_pares'])} pares de prueba ({pct_ruido:.1f} %) son encabezados, fechas o números de página "
               f"(por ejemplo «PÁGINA 13»); sin ellos el chrF++ es {ed['chrf_sin_ruido']} (es→qu) y {qd['chrf_sin_ruido']} (qu→es), es decir, 0.3 puntos menos, "
               f"así que no explican el promedio. (ii) Entre los peores casos restantes hay pares desalineados, con el quechua de una oración junto a la traducción de otra; no medimos su proporción. "
               f"(iii) Hay fallas reales del modelo: {ed['repeticiones']} salidas es→qu ({100 * ed['repeticiones'] / err['n_pares']:.2f} %) y {qd['repeticiones']} qu→es repiten la misma palabra o tres palabras "
               "varias veces («sinchi sinchi sinchi…»)."),
         ("sub", "Costo computacional"),
-        ("p", f"Los cinco entrenamientos (tres semillas y dos ablaciones) suman {h_tot:.2f} horas de GPU, a las que se añaden {h_test:.2f} h de evaluación, en una NVIDIA RTX PRO 5000 Blackwell de 48 GB con bf16. "
+        ("p", f"Los cinco entrenamientos principales (tres semillas y dos ablaciones) suman {h_tot:.2f} horas de GPU, a las que se añaden {h_test:.2f} h de evaluación. Sumando todas las variantes de la Tabla IV, las semillas extra, el ciclo automático y la corrida de 16 GB, el proyecto usó unas {h_all:.0f} horas de entrenamiento (sin contar las 40 000 retrotraducciones ni las evaluaciones FLORES), en una NVIDIA RTX PRO 5000 Blackwell de 48 GB con bf16. "
               f"Una corrida con todos los datos dura entre {min(horas[n] for n in PRINCIPAL):.2f} y {max(horas[n] for n in PRINCIPAL):.2f} h, con un pico de {pico} GB de memoria de vídeo y lotes de 32. "
               "En el servidor, que solo tiene CPU, traducir una oración tarda unos 6 s (medido con tres peticiones). "
               f"Para comprobar que el entrenamiento cabe en una GPU de 16 GB repetimos el modelo principal (semilla 0) en esta misma GPU, limitada a 15 GB, con fp16 y el lote de 32 dividido en 4 micro-lotes. "
               f"El pico de memoria bajó de {pico} GB a {t4h['pico_vram_gb']} GB y el chrF++ en la prueba fue {t4['es->qu']['chrF++']} (es→qu) y {t4['qu->es']['chrF++']} (qu→es), frente a {s['prin'][0]['es->qu']['chrF++']} y {s['prin'][0]['qu->es']['chrF++']} con bf16. "
               f"Tardó {t4h['horas_gpu_entrenamiento']:.2f} h, unas {t4h['horas_gpu_entrenamiento'] / horas['principal_s0']:.1f} veces más que con bf16. "
-              "Esto emula la memoria de una T4, no su velocidad: no la ejecutamos en una T4 real y su tiempo no está medido. "
+              "Esto emula la memoria de una T4; su velocidad no está medida porque no la ejecutamos en una T4 real. "
               "No estimamos la huella de carbono."),
         ("sub", "Uso en la aplicación: dirección, voz y apóstrofo"),
         ("p", "El mismo modelo traduce en ambos sentidos y la aplicación deja elegir la dirección; las Tablas III y IV muestran los resultados de las dos. "
@@ -229,17 +231,17 @@ def bloques() -> list[tuple]:
         ("p", f"Omitir el apóstrofo no es una salida neutra, porque según nuestro léxico a veces distingue palabras: ch'aki (seco) y chaki (pie). "
               f"Con las {ap['recto \'']['n']} palabras con apóstrofo del léxico normalizado, el modelo acierta la glosa en español en {ap['recto \'']['aciertos']} con apóstrofo recto, "
               f"{ap['tipográfico ’']['aciertos']} con apóstrofo tipográfico y {ap['sin apóstrofo']['aciertos']} sin apóstrofo; sin él, ch'aki se traduce como pie, huch'uy como pecar y t'ika como cómodamente. "
-              "Es una prueba pequeña y con palabras que el modelo vio en el entrenamiento, así que muestra la sensibilidad al apóstrofo y no la capacidad de generalizar."),
+              "Es una prueba pequeña y con palabras que el modelo vio en el entrenamiento, así que solo muestra la sensibilidad al apóstrofo en palabras ya vistas."),
 
         ("sec", "Discusión"),
         ("p", "El ajuste fino funciona porque NLLB-200 ya conoce la etiqueta quy_Latn [1]: con unas decenas de miles de pares adapta la ortografía y el vocabulario cotidiano, "
-              "y el modelo sin ajustar ya alcanza 26–28 de chrF++. La ablación indica que el límite es el volumen de datos y no la capacidad del modelo, porque la curva sigue subiendo al pasar del 50 % al 100 %."),
+              "y el modelo sin ajustar ya alcanza 26–28 de chrF++. La ablación indica que el límite parece ser el volumen de datos, porque la curva sigue subiendo al pasar del 50 % al 100 %."),
         ("p", "Hay límites que acotan lo que decimos. Primero, la prueba sale de la misma fuente que el entrenamiento: el reparto sin fuga evita oraciones repetidas, pero no cambia el estilo, "
               "así que el resultado puede ser optimista para texto de otro origen. Segundo, el filtro de dominio es una lista de palabras: es conservador, por lo que también descarta oraciones generales, "
-              "y puede dejar pasar texto de ese tipo sin esas palabras. Tercero, la prueba contiene pares desalineados que penalizan a todos los sistemas por igual y que no auditamos con un hablante. "
+              "y puede dejar pasar texto de esas publicaciones sin esas palabras. Tercero, la prueba contiene pares desalineados que penalizan a todos los sistemas por igual y que no auditamos con un hablante. "
               "Cuarto, no comparamos con otros sistemas de forma directa: el chrF de 34.6 del ganador de 2021 [3], [4] viene de otra prueba. "
               "Quinto, ninguna persona hablante de quechua evaluó las traducciones, y en una lengua aglutinante una cifra de chrF++ no distingue un error de flexión de uno de sentido."),
-        ("p", "Hay también un límite de variedad. Una prueba pequeña, con 24 fichas de cartillas escolares en quechua central, dio un chrF++ inferior al de la prueba de Ayacucho en ambas direcciones, "
+        ("p", "Hay también un límite de variedad. Una prueba pequeña, con los 21 pares de literatura quechua central reservados (los mismos de la Sección IV-B), dio un chrF++ inferior al de la prueba de Ayacucho en ambas direcciones, "
               "lo que indica que el rendimiento cae fuera de la variedad de entrenamiento; no la incluimos entre los resultados porque la fuente tiene derechos reservados y no podemos redistribuirla, ni es una muestra grande."),
         ("p", "Sobre impacto y uso responsable: un traductor con este nivel de calidad puede ayudar a leer o redactar mensajes sencillos, pero puede inventar contenido (las repeticiones y los pares desalineados lo muestran) "
               "y no debe usarse para textos médicos, legales o administrativos sin revisión humana. El conjunto de datos procede en parte de publicaciones con derechos de autor y no declara licencia, "
@@ -250,8 +252,8 @@ def bloques() -> list[tuple]:
               f"unos {e_c[0] - base['es->qu']['chrF++']:.0f} y {q_c[0] - base['qu->es']['chrF++']:.0f} puntos más que sin ajustar, con resultados estables entre semillas y mejoras que crecen con el tamaño del entrenamiento. "
               "De los diez modelos comparados, solo los que añaden el conjunto normalizado mejoran de forma marcada la conjugación de verbos nuevos (más de 30 puntos), sin perder en la prueba propia; es el modelo final y el que sirve la aplicación. "
               "La limpieza y el reparto sin fuga fueron necesarios para poder medir algo."),
-        ("p", "Como trabajo futuro: (1) evaluar en pruebas externas, como FLORES-200 con quy_Latn y los conjuntos de AmericasNLP, que provienen de otras fuentes; "
-              "(2) revisar con un hablante una muestra de la prueba para medir los pares desalineados; (3) reducir las repeticiones con restricciones de decodificación y medir el efecto; "
+        ("p", "Como trabajo futuro: (1) evaluar también con los conjuntos de AmericasNLP, que provienen de otras fuentes (FLORES-200 ya está en la Tabla IV); "
+              "(2) revisar con un hablante una muestra de la prueba para medir los pares desalineados; (3) reducir las repeticiones también en el entrenamiento, ya que la restricción de decodificación las baja pero no las explica; "
               "(4) medir el tiempo de entrenamiento en una T4 real y probar adaptadores (LoRA) para acortarlo; y (5) añadir más texto de Ayacucho de otras fuentes, ya que la ablación sugiere que el modelo sigue mejorando con más datos."),
     ]
 

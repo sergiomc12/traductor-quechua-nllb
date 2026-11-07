@@ -49,13 +49,13 @@ Se recomienda `no_repeat_ngram_size=3`: sin él, el modelo repite palabras en el
 
 ## Entrenamiento
 
-- **Datos:** conjunto `somosnlp-hackathon-2022/spanish-to-quechua` (variedad Ayacucho), limpiado y repartido sin fuga entre particiones, sin ese texto (49 414 pares de entrenamiento), más 15 373 pares de un conjunto normalizado de verbos conjugados, sustantivos, adjetivos y adverbios generado con reglas.
+- **Datos:** conjunto `somosnlp-hackathon-2022/spanish-to-quechua` (variedad Ayacucho), limpiado y repartido sin fuga entre particiones, sin esas publicaciones (49 414 pares de entrenamiento), más 15 373 pares de un conjunto normalizado de verbos conjugados, sustantivos, adjetivos y adverbios generado con reglas.
 - **Método:** ajuste fino de todos los parámetros, 3 épocas, lote de 32, tasa de aprendizaje 3·10⁻⁵, AdamW, bf16. Cada par genera un ejemplo en cada dirección.
 - **Cómputo:** unas 0.5 h en una NVIDIA RTX PRO 5000 Blackwell de 48 GB.
 
 ## Resultados
 
-chrF++ en una prueba de 2 662 pares (misma fuente que el entrenamiento, sin ese texto):
+chrF++ en una prueba de 2 662 pares (misma fuente que el entrenamiento, sin esas publicaciones):
 
 | | es→qu | qu→es |
 |---|---|---|

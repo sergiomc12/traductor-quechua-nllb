@@ -11,13 +11,13 @@ y mucho texto de publicaciones de una sola organización. Un traductor entrenado
 prueba no dice cuánto traduce fuera de él. Por eso:
 
 1. Limpiamos y repartimos los datos **sin fuga** entre entrenamiento, validación y prueba.
-2. **Excluimos ese texto** (55 % de las filas) de las tres particiones.
+2. **Excluimos las publicaciones de esa organización** (55 % de las filas) de las tres particiones.
 3. Ajustamos un modelo multilingüe preentrenado, porque NLLB-200 ya incluye el quechua ayacuchano y unas cien mil oraciones no bastan para entrenar desde cero.
 4. Medimos con tres semillas, una línea base, ablaciones y un examen que mide si el modelo aprende la **conjugación** verbal, no solo si memoriza.
 
 ## Resultados principales
 
-Prueba propia: 2 662 pares sin ese texto. chrF++ (media ± desviación estándar de 3 semillas cuando se indica).
+Prueba propia: 2 662 pares ajenos a esas publicaciones. chrF++ (media ± desviación estándar de 3 semillas cuando se indica).
 
 | Sistema | es→qu | qu→es |
 |---|---|---|
@@ -95,7 +95,7 @@ python -X utf8 scripts/normalizar_dataset_quechua.py
 python -X utf8 scripts/exportar_extra_normalizado.py
 ```
 
-**2. Línea base, modelo principal, ablaciones y semillas** (unas 1.6 h de GPU en total):
+**2. Línea base, modelo principal, ablaciones y semillas** (unas 1.6 h de GPU en total para estas 5 corridas; el proyecto completo, con todas las variantes, suma unas 13 h de entrenamiento):
 
 ```bash
 python -X utf8 src/baseline_nllb.py
@@ -160,7 +160,7 @@ Estado de esta verificación: entrenamos el modelo principal bajo ese tope de 15
 ## Limitaciones y uso responsable
 
 - Prueba de la misma fuente que el entrenamiento, sin evaluación de hablantes: los números no miden el uso real.
-- El filtro de dominio es una lista de palabras: conservador, descarta también oraciones generales y puede dejar pasar texto de ese tipo sin esas palabras.
+- El filtro de dominio es una lista de palabras: conservador, descarta también oraciones generales y puede dejar pasar texto de esas publicaciones sin esas palabras.
 - La prueba contiene pares desalineados y encabezados (2 %); no se auditó con un hablante.
 - Una prueba pequeña con quechua central (21 pares) indica que el rendimiento cae fuera de la variedad de entrenamiento.
 - El traductor puede inventar contenido (repeticiones, pares desalineados): no usar en textos médicos, legales o administrativos sin revisión humana.

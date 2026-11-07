@@ -1,6 +1,6 @@
 {
   "mejor_modelo": "models/exp_norm15k_s0/mejor",
-  "criterio": "Confirmado con 3 semillas del 15k. Test general: qu->es 33.6±0.1 vs 33.3±0.0 de principal (+0.3 consistente), es->qu 38.6±0.0 vs 38.4±0.3 (sin diferencia). FLORES: qu->es +0.4, es->qu -0.3 (principal solo tiene s0). Examen de concordancia (verbos nuevos): es->qu 57.7±0.9 vs 24.8; qu->es 79.3±2.0 vs 53.7. Se elige exp_norm15k_s0 (mejor test entre las semillas). ADVERTENCIA: la referencia de concordancia usa el paradigma Cusco/Chanka definido por las reglas del dataset, no validado por un hablante; principal_s0 se conserva como baseline seguro.",
+  "criterio": "Confirmado con 3 semillas del 15k. Test general: qu->es 33.6±0.1 vs 33.3±0.0 de principal (+0.3 consistente), es->qu 38.6±0.0 vs 38.4±0.3 (sin diferencia). FLORES: qu->es +0.4, es->qu -0.3 (principal solo tiene s0). Examen de concordancia (verbos nuevos): es->qu 57.7±0.9 vs 24.8; qu->es 79.3±2.0 vs 53.7. Se elige exp_norm15k_s0 por el examen de concordancia; las diferencias en el test (±0.3) están dentro del ruido entre semillas, y la cifra a reportar es la media de las 3 semillas (38.6±0.1 / 33.6±0.1). La semilla 0 fue la de mejor test entre las 3, por lo que su cifra individual es algo optimista. Validación de la semilla 0 en results/logs/exp_norm15k_s0.log (época 3: 39.1 / 35.1). ADVERTENCIA: la referencia de concordancia usa el paradigma Cusco/Chanka definido por las reglas del dataset, no validado por un hablante; principal_s0 se conserva como baseline seguro.",
   "resultados_chrF++": {
     "principal_s0": {
       "test": [
