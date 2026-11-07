@@ -37,3 +37,6 @@ Plantilla_Paper_IEEE*.pdf
 
 # Entregables del examen (se envían aparte)
 entrega/
+
+# Predicciones: contienen oraciones del corpus (derechos de autor); se regeneran con src/finetune.py y src/evaluar_test_guardado.py
+results/**/test_predicciones.tsv
