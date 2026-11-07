@@ -38,5 +38,5 @@ Plantilla_Paper_IEEE*.pdf
 # Entregables del examen (se envían aparte)
 entrega/
 
-# Predicciones: contienen oraciones del corpus (derechos de autor); se regeneran con src/finetune.py y src/evaluar_test_guardado.py
-results/**/test_predicciones.tsv
+# Predicciones sobre el texto de literatura quechua central del MINEDU (derechos reservados): no se suben
+results/*/eval_central/
