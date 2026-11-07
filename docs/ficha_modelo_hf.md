@@ -49,13 +49,13 @@ Se recomienda `no_repeat_ngram_size=3`: sin él, el modelo repite palabras en el
 
 ## Entrenamiento
 
-- **Datos:** conjunto `somosnlp-hackathon-2022/spanish-to-quechua` (variedad Ayacucho), limpiado y repartido sin fuga entre particiones, sin el texto de tipo publicaciones de una sola organización (49 414 pares de entrenamiento), más 15 373 pares de un conjunto normalizado de verbos conjugados, sustantivos, adjetivos y adverbios generado con reglas.
+- **Datos:** conjunto `somosnlp-hackathon-2022/spanish-to-quechua` (variedad Ayacucho), limpiado y repartido sin fuga entre particiones, sin ese texto (49 414 pares de entrenamiento), más 15 373 pares de un conjunto normalizado de verbos conjugados, sustantivos, adjetivos y adverbios generado con reglas.
 - **Método:** ajuste fino de todos los parámetros, 3 épocas, lote de 32, tasa de aprendizaje 3·10⁻⁵, AdamW, bf16. Cada par genera un ejemplo en cada dirección.
 - **Cómputo:** unas 0.5 h en una NVIDIA RTX PRO 5000 Blackwell de 48 GB.
 
 ## Resultados
 
-chrF++ en una prueba de 2 662 pares (misma fuente que el entrenamiento, sin texto de tipo publicaciones de una sola organización):
+chrF++ en una prueba de 2 662 pares (misma fuente que el entrenamiento, sin ese texto):
 
 | | es→qu | qu→es |
 |---|---|---|
@@ -75,4 +75,4 @@ Más detalle en el artículo.
 
 ## Licencia
 
-NLLB-200 se distribuye con licencia CC-BY-NC 4.0, por lo que este modelo es **solo para uso no comercial**. El conjunto de entrenamiento de Ayacucho no declara licencia y parte de él proviene de publicaciones de una sola organización.
+NLLB-200 se distribuye con licencia CC-BY-NC 4.0, por lo que este modelo es **solo para uso no comercial**. El conjunto de entrenamiento de Ayacucho no declara licencia y parte de él proviene de publicaciones con derechos de autor.

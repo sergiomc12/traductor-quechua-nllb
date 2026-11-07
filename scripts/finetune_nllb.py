@@ -7,7 +7,7 @@ Decisiones (ver AGENTS.md §6):
   - Una variedad (Ayacucho) porque NLLB solo tiene quy_Latn y los papers no
     mezclan variedades.
   - Un modelo para ambas direcciones: cada par genera dos ejemplos (es->qu y qu->es).
-  - El contenido biblico se reduce (--frac-biblico) para no sobreajustar a publicaciones de una sola organización.
+  - El contenido biblico se reduce (--frac-biblico) para no sobreajustar a ese texto.
   - Se elige el mejor punto por chrF++ en valid NO biblico (el dominio mas debil).
 Solo usa PyTorch + transformers + sacrebleu (sin accelerate/Trainer).
 """

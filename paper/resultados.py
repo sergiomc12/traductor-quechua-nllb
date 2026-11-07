@@ -104,10 +104,10 @@ def resumen() -> str:
     be, bq = s["ms"]("es->qu", "BLEU"), s["ms"]("qu->es", "BLEU")
     h = sum(v["horas_gpu_entrenamiento"] for v in s["horas"].values())
     return (
-        "El quechua ayacuchano tiene pocos textos paralelos con el español, y los conjuntos públicos mezclan duplicados, fuga entre particiones y mucho texto de tipo publicaciones de una sola organización. "
+        "El quechua ayacuchano tiene pocos textos paralelos con el español, y los conjuntos públicos mezclan duplicados, fuga entre particiones y mucho texto de publicaciones de una sola organización. "
         "Ajustamos NLLB-200 de 600 millones de parámetros como un solo modelo bidireccional español–quechua. Limpiamos y repartimos sin fuga 122 802 pares públicos, "
         "excluimos el 55 % que un filtro léxico asocia a ese tipo de texto y entrenamos con 49 414 pares. "
-        f"En una prueba de 2 662 pares sin texto de tipo publicaciones de una sola organización, tres semillas dan un chrF++ de {_pm(*e)} (es→qu) y {_pm(*q)} (qu→es), frente a {s['base']['es->qu']['chrF++']} y {s['base']['qu->es']['chrF++']} "
+        f"En una prueba de 2 662 pares sin ese texto, tres semillas dan un chrF++ de {_pm(*e)} (es→qu) y {_pm(*q)} (qu→es), frente a {s['base']['es->qu']['chrF++']} y {s['base']['qu->es']['chrF++']} "
         f"del mismo modelo sin ajustar, y un BLEU de {be[0]:.1f} y {bq[0]:.1f}. "
         f"Entrenar con el 25 %, el 50 % y el 100 % de los datos sube el chrF++ es→qu de {s['abl'][25]['es->qu']['chrF++']} a {s['abl'][50]['es->qu']['chrF++']} y a {e[0]:.1f}. "
         "Comparamos diez modelos. Los cambios en la selección de datos y la retrotraducción no mueven la prueba propia más de un punto. "
@@ -246,7 +246,7 @@ def bloques() -> list[tuple]:
               "y NLLB-200 se distribuye con licencia CC-BY-NC, por lo que el modelo es solo para uso no comercial. El servicio y la aplicación son prototipos y no se probaron con la comunidad hablante."),
 
         ("sec", "Conclusiones"),
-        ("p", f"Un solo NLLB-200 ajustado con 49 414 pares sin texto de tipo publicaciones de una sola organización de quechua ayacuchano traduce en ambos sentidos con {e_c[0]:.1f} (es→qu) y {q_c[0]:.1f} (qu→es) de chrF++, "
+        ("p", f"Un solo NLLB-200 ajustado con 49 414 pares filtrados de quechua ayacuchano traduce en ambos sentidos con {e_c[0]:.1f} (es→qu) y {q_c[0]:.1f} (qu→es) de chrF++, "
               f"unos {e_c[0] - base['es->qu']['chrF++']:.0f} y {q_c[0] - base['qu->es']['chrF++']:.0f} puntos más que sin ajustar, con resultados estables entre semillas y mejoras que crecen con el tamaño del entrenamiento. "
               "De los diez modelos comparados, solo los que añaden el conjunto normalizado mejoran de forma marcada la conjugación de verbos nuevos (más de 30 puntos), sin perder en la prueba propia; es el modelo final y el que sirve la aplicación. "
               "La limpieza y el reparto sin fuga fueron necesarios para poder medir algo."),

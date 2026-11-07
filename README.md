@@ -7,17 +7,17 @@ aplicación Android. El artículo en formato IEEE está en [`paper/`](paper/).
 ## Qué problema resuelve y por qué así
 
 El quechua ayacuchano tiene pocos textos paralelos con el español, y los conjuntos públicos mezclan duplicados, fuga entre particiones
-y mucho texto de tipo publicaciones de una sola organización. Un traductor entrenado así aprende sobre todo ese estilo, y un promedio global sobre su
+y mucho texto de publicaciones de una sola organización. Un traductor entrenado así aprende sobre todo ese estilo, y un promedio global sobre su
 prueba no dice cuánto traduce fuera de él. Por eso:
 
 1. Limpiamos y repartimos los datos **sin fuga** entre entrenamiento, validación y prueba.
-2. **Excluimos el texto de tipo publicaciones de una sola organización** (55 % de las filas) de las tres particiones.
+2. **Excluimos ese texto** (55 % de las filas) de las tres particiones.
 3. Ajustamos un modelo multilingüe preentrenado, porque NLLB-200 ya incluye el quechua ayacuchano y unas cien mil oraciones no bastan para entrenar desde cero.
 4. Medimos con tres semillas, una línea base, ablaciones y un examen que mide si el modelo aprende la **conjugación** verbal, no solo si memoriza.
 
 ## Resultados principales
 
-Prueba propia: 2 662 pares sin texto de tipo publicaciones de una sola organización. chrF++ (media ± desviación estándar de 3 semillas cuando se indica).
+Prueba propia: 2 662 pares sin ese texto. chrF++ (media ± desviación estándar de 3 semillas cuando se indica).
 
 | Sistema | es→qu | qu→es |
 |---|---|---|
@@ -164,7 +164,7 @@ Estado de esta verificación: entrenamos el modelo principal bajo ese tope de 15
 - La prueba contiene pares desalineados y encabezados (2 %); no se auditó con un hablante.
 - Una prueba pequeña con quechua central (21 pares) indica que el rendimiento cae fuera de la variedad de entrenamiento.
 - El traductor puede inventar contenido (repeticiones, pares desalineados): no usar en textos médicos, legales o administrativos sin revisión humana.
-- Licencias: el conjunto de Ayacucho no declara licencia y parte proviene de publicaciones de una sola organización; NLLB-200 es CC-BY-NC. Uso académico y no comercial.
+- Licencias: el conjunto de Ayacucho no declara licencia y parte proviene de publicaciones con derechos de autor; NLLB-200 es CC-BY-NC. Uso académico y no comercial.
 
 ## Equipo y contribuciones
 

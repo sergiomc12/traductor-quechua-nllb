@@ -79,7 +79,7 @@ Los recursos de voz (Siminchik, ASR) no aplican a traducción de texto.
 **NO es un diccionario:** `quechua_glossary.txt` / `spanish_glossary.txt` (~6 150 líneas) son salida de un script de segmentación (`parse_spanish_file.py`), no un léxico bilingüe palabra a palabra. Para diccionario seguir con Wiktionary (§3).
 
 **Advertencias:**
-1. **Licencia:** el corpus viene de **publicaciones de una sola organización** (textos de una organización, © visible dentro de los datos); OPUS retiró publicaciones de una sola organización de su sitio por temas de licencia. Aceptable para investigación/pruebas internas; **verificar antes de uso en un producto público**.
+1. **Licencia:** el corpus viene de publicaciones de una sola organización (© visible dentro de los datos); el repositorio de origen las retiró de su sitio por temas de licencia. Aceptable para investigación/pruebas internas; **verificar antes de uso en un producto público**.
 2. **Dominio sesgado:** religioso y revistas (salud, familia). Traducirá peor texto cotidiano o administrativo.
 3. **Variedad:** ortografía (`juntʼasqa`, `kausakusunman`) apunta a quechua sureño tipo Collao/boliviano; confirmar si coincide con la variedad objetivo (Ayacucho `quy` o Cusco `quz`).
 4. **Volumen:** 17 500 pares no alcanzan para entrenar desde cero; sí para ajustar un modelo preentrenado (p. ej. NLLB `quy_Latn`).
@@ -113,7 +113,7 @@ Los recursos de voz (Siminchik, ASR) no aplican a traducción de texto.
 | Repo | ¿Datos de texto? | Licencia | Veredicto |
 |---|---|---|---|
 | Churana | No | Ninguna | Solo un índice de referencias |
-| mt_quechua_spanish | Sí (~17 500 pares) | Sin declarar; publicaciones de una sola organización con © | Mejor fuente de texto |
+| mt_quechua_spanish | Sí (~17 500 pares) | Sin declarar; parte con © | Mejor fuente de texto |
 | IWSLT2025 | Poco, de habla | CC BY-NC-ND 3.0 | Solo evaluación y validación |
 
 ### 4.5 Papers de traducción español↔quechua — buscados y descargados 5-nov-2026
@@ -133,7 +133,7 @@ PDFs en `papers/` (todos de acceso abierto, verificados como PDF):
 | `2024_NLP_progress_indigenous_LatAm_NAACL_arXiv2404.05365.pdf` | Panorama NLP en lenguas indígenas latinoamericanas | arXiv |
 | `2022_multilingual_transfer_indigenous_NMT_arXiv2205.06993.pdf` | Transferencia multilingüe para NMT indígena | arXiv |
 
-Datos útiles extraídos de los resultados de búsqueda (no leídos a fondo): AmericasNLP se centra en quechua **Ayacucho (`quy`)**, así que los resultados pueden no trasladarse a Cusco; el entrenamiento oficial de quechua salió de **publicaciones de una sola organización**.
+Datos útiles extraídos de los resultados de búsqueda (no leídos a fondo): AmericasNLP se centra en quechua **Ayacucho (`quy`)**, así que los resultados pueden no trasladarse a Cusco; el entrenamiento oficial de quechua salió de publicaciones de una sola organización.
 
 ### 4.6 Datasets descargados (en `data/`) — con auditoría de calidad
 
@@ -146,7 +146,7 @@ Descartado: `VoiceProfiler/QuEsT` (solo audio, ~40 min, GPLv3) — no sirve para
 
 **Hallazgos de la auditoría (medidos, no supuestos):**
 1. **Fuga entre particiones:** frases `es` de validación/test que ya están en `train`: Ayacucho 7.3 % / 6.9 %; Cusco 17.0 % / 3.2 %; **el split `eval` de Cusco está 100 % contenido en `train`** → inservible para evaluar. Deduplicar y reparticionar antes de medir BLEU/chrF++.
-2. **Sesgo bíblico/religioso:** ~25 % de las filas de `train` contienen "Dios/Jehová/Biblia" en ambos datasets (consistente con publicaciones de una sola organización). El README de Ayacucho lo admite.
+2. **Sesgo bíblico/religioso:** ~25 % de las filas de `train` contienen "Dios/Jehová/Biblia" en ambos datasets (consistente con esas publicaciones). El README de Ayacucho lo admite.
 3. **Ruido en Cusco:** 2 637 filas con `spa == quz` (sin traducir), 345 filas vacías o de <3 caracteres, 1 465 filas de más de 500 caracteres (párrafos sin segmentar, ej. texto de tesis). En Ayacucho: 53 filas vacías/cortas, 3 idénticas, 8 largas.
 4. **Duplicados en `train`:** 3 454 (Ayacucho) y 4 629 (Cusco).
 5. **Procedencia:** Ayacucho agrupa blogs, Tatoeba, AmericasNLP 2021 y publicaciones de una sola organización (limpieza manual parcial); Cusco no documenta origen. Revisar derechos de cada fuente antes de uso comercial.
@@ -183,7 +183,7 @@ Descartado: `VoiceProfiler/QuEsT` (solo audio, ~40 min, GPLv3) — no sirve para
 | Script de fine-tuning | Escrito, no ejecutado |
 | Entrenar y evaluar | Pendiente |
 | Evaluación externa (`kallpa`, valid de IWSLT, scorer de IWSLT) | Pendiente |
-| Licencias para producción (publicaciones de una sola organización sin declarar; NLLB CC-BY-NC sin verificar) | Pendiente |
+| Licencias para producción (licencia de los datos sin declarar; NLLB CC-BY-NC sin verificar) | Pendiente |
 | ZORA (UZH), `hinantin`, Siminchikkunarayku | Pendiente |
 | Git + `.gitignore` (`data/`, `papers/`, `models/`, `.env`) | Pendiente |
 
@@ -196,14 +196,14 @@ Requisitos del PDF (`redesneuronales/examenfinal/ExamenFinal_MIA_203 (1).pdf`) y
 - R5: análisis de errores sistemático (por dominio, longitud, sufijos) o mapas de atención. **Pendiente.**
 - R6: reportar hardware y horas de GPU (el script solo imprime el tiempo total) + limitaciones/sesgos (sesgo bíblico ya documentado). **Parcial.**
 - Cómputo: el entrenamiento debe poder reproducirse en Colab T4 (16 GB); `finetune_nllb.py` usa **bf16, que la T4 no soporta de forma nativa** → pasar a fp16 con escalado o LoRA, o entregar pesos + versión reducida. **Pendiente.**
-- Licencias: declarar en el paper que los datasets de HF no declaran licencia (origen publicaciones de una sola organización) y verificar la de NLLB (CC-BY-NC). **Pendiente.**
+- Licencias: declarar en el paper que los datasets de HF no declaran licencia (origen: publicaciones de una sola organización) y verificar la de NLLB (CC-BY-NC). **Pendiente.**
 - Repo: `README.md`, `requirements.txt`, `src/`, `configs/`, `results/`, notebook de demo en Colab, semillas fijas, enlace a pesos, commits de todos, etiqueta `v1.0-final`. Hoy no hay git ni nada de eso (los scripts están en `scripts/`).
 - Entregables: paper IEEE ≤12 págs con sección *Contribuciones*, diapositivas (25 min), declaración de uso de asistentes de IA. Entrega: 6-nov (sección C) o 7-nov (A y B).
 
 ## 8. Decisiones de 5-nov-2026 (tarde): sin texto religioso
 
 - Auditoria: el filtro de 5 palabras (Dios/Jehova/...) marcaba 34 %; el filtro ampliado (`src/marcar_religioso.py`, vocabulario de las revistas + citas + formas quechuas con sufijos) marca 55 % (train), 49 % (valid), 56 % (test). Hay ademas pares mal alineados.
-- **Decision del usuario:** quitar el texto religioso (tipo publicaciones de una sola organización) de TODO el proyecto. Se entrena, valida y prueba solo con `data/limpio/ayacucho_general/` (49 414 / 3 477 / 2 662 pares). No se puede aislar publicaciones de una sola organización exacto: el dataset de HF no marca la fuente por fila; el filtro es conservador y puede dejar algo sin detectar.
+- **Decision del usuario:** quitar ese texto de TODO el proyecto. Se entrena, valida y prueba solo con `data/limpio/ayacucho_general/` (49 414 / 3 477 / 2 662 pares). No se puede aislar la fuente exacta: el dataset de HF no marca la fuente por fila; el filtro es conservador y puede dejar algo sin detectar.
 - Ablacion de R4 = tamano del entrenamiento (25 / 50 / 100 %), 3 semillas en el principal. Las corridas con 30 % y 100 % religioso se cancelaron.
 - Linea base zero-shot (mismo test general): es->qu chrF++ 26.4 / BLEU 3.2; qu->es chrF++ 27.6 / BLEU 9.7 (`results/baseline_zeroshot/`).
 - Entrenamiento en Windows: sin `torch.cuda.set_per_process_memory_fraction(0.8)` la GPU desborda a RAM compartida y se frena ~4x. NO usar `PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb` (empeora).

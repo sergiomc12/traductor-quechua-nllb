@@ -1,7 +1,7 @@
 """Agrega la columna `religioso` a data/limpio/ayacucho/*.tsv (conserva `biblico`).
 
 El filtro original de 5 palabras (`biblico`) dejaba pasar ~15 puntos porcentuales de texto de las revistas
-de publicaciones de una sola organización: vocabulario propio, citas biblicas (Is. 55: 9) y formas quechuas con sufijos (Diospa, Jehovaq).
+de una sola organización: vocabulario propio, citas biblicas (Is. 55: 9) y formas quechuas con sufijos (Diospa, Jehovaq).
 `religioso` es deliberadamente conservador: ante la duda marca la fila como religiosa, de modo que el
 subconjunto NO religioso sea lo mas limpio posible.
 
