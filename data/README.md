@@ -26,13 +26,13 @@ Todos los comandos se ejecutan desde la raíz del repositorio.
 #    (con la CLI de Hugging Face: hf download somosnlp-hackathon-2022/spanish-to-quechua --repo-type dataset --local-dir data/hf_somosnlp_spanish_to_quechua)
 # 2. Limpieza y reparto sin fuga entre particiones  -> data/limpio/ayacucho/{train,valid,test}.tsv
 python -X utf8 src/limpiar_datos.py
-# 3. Marcar texto religioso                          -> columna `religioso`
+# 3. Marcar texto de tipo publicaciones de una sola organización                      -> columna `religioso` (nombre interno)
 python -X utf8 src/marcar_religioso.py
-# 4. Quedarse con el texto no religioso              -> data/limpio/ayacucho_general/{train,valid,test}.tsv
+# 4. Quedarse con el texto sin marcar                   -> data/limpio/ayacucho_general/{train,valid,test}.tsv
 python -X utf8 src/preparar_particiones.py
 ```
 
-Resultado esperado (Tablas I y II del artículo): 122 802 pares limpios; tras excluir el texto religioso quedan
+Resultado esperado (Tablas I y II del artículo): 122 802 pares limpios; tras excluir el texto de tipo publicaciones de una sola organización quedan
 49 414 de entrenamiento, 3 477 de validación y 2 662 de prueba.
 
 ### Conjunto normalizado (modelo final)

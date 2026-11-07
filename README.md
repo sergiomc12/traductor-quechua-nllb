@@ -1,4 +1,4 @@
-# Traducción neuronal español ↔ quechua ayacuchano con NLLB-200
+# Traducción neuronal bidireccional español–quechua mediante ajuste fino de NLLB-200
 
 Proyecto final de MIA-203 Redes Neuronales y Aprendizaje Profundo (UNI FIIS). Ajustamos **NLLB-200-distilled-600M** como un solo modelo
 bidireccional español–quechua (`quy_Latn`), lo comparamos con una línea base y con otros nueve modelos, y lo desplegamos como servicio web y
@@ -7,17 +7,17 @@ aplicación Android. El artículo en formato IEEE está en [`paper/`](paper/).
 ## Qué problema resuelve y por qué así
 
 El quechua ayacuchano tiene pocos textos paralelos con el español, y los conjuntos públicos mezclan duplicados, fuga entre particiones
-y mucho texto religioso (de tipo publicaciones de una sola organización). Un traductor entrenado así aprende sobre todo ese estilo, y un promedio global sobre su
+y mucho texto de tipo publicaciones de una sola organización. Un traductor entrenado así aprende sobre todo ese estilo, y un promedio global sobre su
 prueba no dice cuánto traduce fuera de él. Por eso:
 
 1. Limpiamos y repartimos los datos **sin fuga** entre entrenamiento, validación y prueba.
-2. **Excluimos el texto religioso** (55 % de las filas) de las tres particiones.
+2. **Excluimos el texto de tipo publicaciones de una sola organización** (55 % de las filas) de las tres particiones.
 3. Ajustamos un modelo multilingüe preentrenado, porque NLLB-200 ya incluye el quechua ayacuchano y unas cien mil oraciones no bastan para entrenar desde cero.
 4. Medimos con tres semillas, una línea base, ablaciones y un examen que mide si el modelo aprende la **conjugación** verbal, no solo si memoriza.
 
 ## Resultados principales
 
-Prueba propia: 2 662 pares sin texto religioso. chrF++ (media ± desviación estándar de 3 semillas cuando se indica).
+Prueba propia: 2 662 pares sin texto de tipo publicaciones de una sola organización. chrF++ (media ± desviación estándar de 3 semillas cuando se indica).
 
 | Sistema | es→qu | qu→es |
 |---|---|---|
@@ -66,7 +66,7 @@ paper/          artículo IEEE: contenido.py y resultados.py (fuente única), co
 src/            limpieza, entrenamiento (finetune.py), evaluación, examen de concordancia, ciclo automático, servicio (servicio/api.py)
 scripts/        normalización del dataset, exportación de pares extra, pruebas del apóstrofo
 configs/        hiperparámetros: experimentos.json (principal, ablaciones, semillas)
-notebooks/      demo_colab.ipynb (inferencia con los pesos) y entrenar_colab_t4.ipynb (entrenamiento en T4)
+notebooks/      exploracion_resultados.ipynb (tablas, concordancia y errores desde results/), demo_colab.ipynb (inferencia con los pesos) y entrenar_colab_t4.ipynb (entrenamiento en T4)
 data/           NO versionado; ver data/README.md (fuentes, licencias y cómo reconstruirlo)
 results/        resultados de cada experimento: test.json, historial.json, predicciones, concordancia, FLORES, figuras y logs
 tests/          pruebas unitarias del normalizador y de la construcción de literatura central
@@ -140,7 +140,7 @@ Cada cifra del artículo se lee de `results/` al compilarlo (`paper/resultados.p
 Con `--precision fp16 --acumulacion 4 --limite-vram-gb 15` el entrenamiento llega a un pico de 13.2 GB. `notebooks/entrenar_colab_t4.ipynb` lo ejecuta en Colab.
 
 Estado de esta verificación: entrenamos el modelo principal bajo ese tope de 15 GB y en fp16 en **nuestra GPU** (que emula la memoria de una T4, no su velocidad).
-**No lo ejecutamos en una T4 real**, así que no tenemos tiempos medidos en esa tarjeta. Los resultados de esa corrida están en `results/t4_emulada_s0/` (ver el artículo).
+**No lo ejecutamos en una T4 real**, así que no tenemos tiempos medidos en esa tarjeta. Resultado (`results/t4_emulada_s0/`): pico de 13.2 GB (frente a 19.5 GB con bf16), chrF++ de 38.6 (es→qu) y 33.3 (qu→es) frente a 38.7 y 33.3 con bf16, y 0.99 h de entrenamiento en lugar de 0.43 h.
 
 ## Modelo, servicio y aplicación
 
@@ -160,7 +160,7 @@ Estado de esta verificación: entrenamos el modelo principal bajo ese tope de 15
 ## Limitaciones y uso responsable
 
 - Prueba de la misma fuente que el entrenamiento, sin evaluación de hablantes: los números no miden el uso real.
-- El filtro de texto religioso es una lista de palabras: conservador, descarta también oraciones generales y puede dejar pasar texto religioso sin esas palabras.
+- El filtro de dominio es una lista de palabras: conservador, descarta también oraciones generales y puede dejar pasar texto de ese tipo sin esas palabras.
 - La prueba contiene pares desalineados y encabezados (2 %); no se auditó con un hablante.
 - Una prueba pequeña con quechua central (21 pares) indica que el rendimiento cae fuera de la variedad de entrenamiento.
 - El traductor puede inventar contenido (repeticiones, pares desalineados): no usar en textos médicos, legales o administrativos sin revisión humana.

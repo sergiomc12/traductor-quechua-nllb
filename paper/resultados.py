@@ -104,10 +104,10 @@ def resumen() -> str:
     be, bq = s["ms"]("es->qu", "BLEU"), s["ms"]("qu->es", "BLEU")
     h = sum(v["horas_gpu_entrenamiento"] for v in s["horas"].values())
     return (
-        "El quechua ayacuchano tiene pocos textos paralelos con el español, y los conjuntos públicos mezclan duplicados, fuga entre particiones y mucho contenido religioso. "
+        "El quechua ayacuchano tiene pocos textos paralelos con el español, y los conjuntos públicos mezclan duplicados, fuga entre particiones y mucho texto de tipo publicaciones de una sola organización. "
         "Ajustamos NLLB-200 de 600 millones de parámetros como un solo modelo bidireccional español–quechua. Limpiamos y repartimos sin fuga 122 802 pares públicos, "
-        "excluimos el 55 % marcado como religioso y entrenamos con 49 414 pares. "
-        f"En una prueba de 2 662 pares sin texto religioso, tres semillas dan un chrF++ de {_pm(*e)} (es→qu) y {_pm(*q)} (qu→es), frente a {s['base']['es->qu']['chrF++']} y {s['base']['qu->es']['chrF++']} "
+        "excluimos el 55 % que un filtro léxico asocia a ese tipo de texto y entrenamos con 49 414 pares. "
+        f"En una prueba de 2 662 pares sin texto de tipo publicaciones de una sola organización, tres semillas dan un chrF++ de {_pm(*e)} (es→qu) y {_pm(*q)} (qu→es), frente a {s['base']['es->qu']['chrF++']} y {s['base']['qu->es']['chrF++']} "
         f"del mismo modelo sin ajustar, y un BLEU de {be[0]:.1f} y {bq[0]:.1f}. "
         f"Entrenar con el 25 %, el 50 % y el 100 % de los datos sube el chrF++ es→qu de {s['abl'][25]['es->qu']['chrF++']} a {s['abl'][50]['es->qu']['chrF++']} y a {e[0]:.1f}. "
         "Comparamos diez modelos. Los cambios en la selección de datos y la retrotraducción no mueven la prueba propia más de un punto. "
@@ -128,6 +128,7 @@ def bloques() -> list[tuple]:
     e_b, q_b = ms("es->qu", "BLEU"), ms("qu->es", "BLEU")
     ed, qd = err["por_direccion"]["es->qu"], err["por_direccion"]["qu->es"]
     horas = {k: v["horas_gpu_entrenamiento"] for k, v in s["horas"].items()}
+    t4, t4h = _j("t4_emulada_s0", "test.json"), _j("t4_emulada_s0", "historial.json")
     h_tot = sum(horas.values())
     h_test = sum(v["horas_gpu_test"] for v in s["horas"].values())
     pico = max(v["pico_vram_gb"] for v in s["horas"].values())
@@ -200,7 +201,7 @@ def bloques() -> list[tuple]:
               "Es una medida estricta: exige la palabra completa, y la traducción de referencia puede ser libre, así que un valor bajo no prueba por sí solo un error. "
               "Aun así, los sufijos que marcan relaciones (-manta, -wan, -paq) se reproducen mucho menos que -pa, lo que sugiere que la flexión es la parte más difícil."),
         ("table", "tab:sufijos", "Recall de sufijos en es→qu (palabra completa idéntica a la referencia)", ["Sufijo", "Apariciones", "Recall"], suf_filas),
-        ("p", f"Revisamos además los casos de menor puntaje. Tres hallazgos: (i) {err['n_ruido']} de {_n(err['n_pares'])} pares de prueba ({pct_ruido:.1f} %) son encabezados, fechas o números de página "
+        ("p", f"Revisamos también los casos de menor puntaje. Tres hallazgos: (i) {err['n_ruido']} de {_n(err['n_pares'])} pares de prueba ({pct_ruido:.1f} %) son encabezados, fechas o números de página "
               f"(por ejemplo «PÁGINA 13»); sin ellos el chrF++ es {ed['chrf_sin_ruido']} (es→qu) y {qd['chrf_sin_ruido']} (qu→es), es decir, 0.3 puntos menos, "
               f"así que no explican el promedio. (ii) Entre los peores casos restantes hay pares desalineados, con el quechua de una oración junto a la traducción de otra; no medimos su proporción. "
               f"(iii) Hay fallas reales del modelo: {ed['repeticiones']} salidas es→qu ({100 * ed['repeticiones'] / err['n_pares']:.2f} %) y {qd['repeticiones']} qu→es repiten la misma palabra o tres palabras "
@@ -209,7 +210,10 @@ def bloques() -> list[tuple]:
         ("p", f"Los cinco entrenamientos (tres semillas y dos ablaciones) suman {h_tot:.2f} horas de GPU, a las que se añaden {h_test:.2f} h de evaluación, en una NVIDIA RTX PRO 5000 Blackwell de 48 GB con bf16. "
               f"Una corrida con todos los datos dura entre {min(horas[n] for n in PRINCIPAL):.2f} y {max(horas[n] for n in PRINCIPAL):.2f} h, con un pico de {pico} GB de memoria de vídeo y lotes de 32. "
               "En el servidor, que solo tiene CPU, traducir una oración tarda unos 6 s (medido con tres peticiones). "
-              "No ejecutamos el entrenamiento en una T4: su memoria de 16 GB queda por debajo de nuestro pico, por lo que habría que reducir el lote y usar fp16, algo que el script admite pero que no probamos. "
+              f"Para comprobar que el entrenamiento cabe en una GPU de 16 GB repetimos el modelo principal (semilla 0) en esta misma GPU, limitada a 15 GB, con fp16 y el lote de 32 dividido en 4 micro-lotes. "
+              f"El pico de memoria bajó de {pico} GB a {t4h['pico_vram_gb']} GB y el chrF++ en la prueba fue {t4['es->qu']['chrF++']} (es→qu) y {t4['qu->es']['chrF++']} (qu→es), frente a {s['prin'][0]['es->qu']['chrF++']} y {s['prin'][0]['qu->es']['chrF++']} con bf16. "
+              f"Tardó {t4h['horas_gpu_entrenamiento']:.2f} h, unas {t4h['horas_gpu_entrenamiento'] / horas['principal_s0']:.1f} veces más que con bf16. "
+              "Esto emula la memoria de una T4, no su velocidad: no la ejecutamos en una T4 real y su tiempo no está medido. "
               "No estimamos la huella de carbono."),
         ("sub", "Uso en la aplicación: dirección, voz y apóstrofo"),
         ("p", "El mismo modelo traduce en ambos sentidos y la aplicación deja elegir la dirección; las Tablas III y IV muestran los resultados de las dos. "
@@ -217,7 +221,7 @@ def bloques() -> list[tuple]:
               "Del quechua al español la entrada no se puede dictar con fiabilidad: Android no reconoce quechua, y lo que se dicta se transcribe como si fuera español, así que el texto se escribe a mano. "
               "No medimos la tasa de error de ese reconocimiento; lo descrito sale de la configuración de la aplicación y de lo que observó el equipo. "
               "La voz de salida tampoco es quechua: usa una voz en español a velocidad reducida, que solo aproxima la pronunciación."),
-        ("p", f"Escribir quechua tiene además un obstáculo ortográfico. Las consonantes eyectivas se marcan con un apóstrofo dentro de la palabra (p'unchaw, ch'aki, t'anta), "
+        ("p", f"Escribir quechua tiene también un obstáculo ortográfico. Las consonantes eyectivas se marcan con un apóstrofo dentro de la palabra (p'unchaw, ch'aki, t'anta), "
               "un carácter que no está en la capa principal del teclado de un teléfono. "
               f"En los datos casi no aparece: {apo['train_qu']['frases_con']} de {_n(apo['train_qu']['frases'])} oraciones de entrenamiento ({100 * apo['train_qu']['frases_con'] / apo['train_qu']['frases']:.1f} %) "
               f"y {apo['train_qu']['palabras_con']} de {_n(apo['train_qu']['palabras'])} palabras llevan apóstrofo interno, y se escribe de dos formas ({apo['train_qu']['formas']['’']} con apóstrofo tipográfico y {apo['train_qu']['formas']['\'']} con apóstrofo recto). "
@@ -231,8 +235,8 @@ def bloques() -> list[tuple]:
         ("p", "El ajuste fino funciona porque NLLB-200 ya conoce la etiqueta quy_Latn [1]: con unas decenas de miles de pares adapta la ortografía y el vocabulario cotidiano, "
               "y el modelo sin ajustar ya alcanza 26–28 de chrF++. La ablación indica que el límite es el volumen de datos y no la capacidad del modelo, porque la curva sigue subiendo al pasar del 50 % al 100 %."),
         ("p", "Hay límites que acotan lo que decimos. Primero, la prueba sale de la misma fuente que el entrenamiento: el reparto sin fuga evita oraciones repetidas, pero no cambia el estilo, "
-              "así que el resultado puede ser optimista para texto de otro origen. Segundo, el filtro de contenido religioso es una lista de palabras: es conservador, por lo que también descarta oraciones generales, "
-              "y puede dejar pasar texto religioso sin esas palabras. Tercero, la prueba contiene pares desalineados que penalizan a todos los sistemas por igual y que no auditamos con un hablante. "
+              "así que el resultado puede ser optimista para texto de otro origen. Segundo, el filtro de dominio es una lista de palabras: es conservador, por lo que también descarta oraciones generales, "
+              "y puede dejar pasar texto de ese tipo sin esas palabras. Tercero, la prueba contiene pares desalineados que penalizan a todos los sistemas por igual y que no auditamos con un hablante. "
               "Cuarto, no comparamos con otros sistemas de forma directa: el chrF de 34.6 del ganador de 2021 [3], [4] viene de otra prueba. "
               "Quinto, ninguna persona hablante de quechua evaluó las traducciones, y en una lengua aglutinante una cifra de chrF++ no distingue un error de flexión de uno de sentido."),
         ("p", "Hay también un límite de variedad. Una prueba pequeña, con 24 fichas de cartillas escolares en quechua central, dio un chrF++ inferior al de la prueba de Ayacucho en ambas direcciones, "
@@ -242,13 +246,13 @@ def bloques() -> list[tuple]:
               "y NLLB-200 se distribuye con licencia CC-BY-NC, por lo que el modelo es solo para uso no comercial. El servicio y la aplicación son prototipos y no se probaron con la comunidad hablante."),
 
         ("sec", "Conclusiones"),
-        ("p", f"Un solo NLLB-200 ajustado con 49 414 pares no religiosos de quechua ayacuchano traduce en ambos sentidos con {e_c[0]:.1f} (es→qu) y {q_c[0]:.1f} (qu→es) de chrF++, "
+        ("p", f"Un solo NLLB-200 ajustado con 49 414 pares sin texto de tipo publicaciones de una sola organización de quechua ayacuchano traduce en ambos sentidos con {e_c[0]:.1f} (es→qu) y {q_c[0]:.1f} (qu→es) de chrF++, "
               f"unos {e_c[0] - base['es->qu']['chrF++']:.0f} y {q_c[0] - base['qu->es']['chrF++']:.0f} puntos más que sin ajustar, con resultados estables entre semillas y mejoras que crecen con el tamaño del entrenamiento. "
               "De los diez modelos comparados, solo los que añaden el conjunto normalizado mejoran de forma marcada la conjugación de verbos nuevos (más de 30 puntos), sin perder en la prueba propia; es el modelo final y el que sirve la aplicación. "
               "La limpieza y el reparto sin fuga fueron necesarios para poder medir algo."),
         ("p", "Como trabajo futuro: (1) evaluar en pruebas externas, como FLORES-200 con quy_Latn y los conjuntos de AmericasNLP, que provienen de otras fuentes; "
               "(2) revisar con un hablante una muestra de la prueba para medir los pares desalineados; (3) reducir las repeticiones con restricciones de decodificación y medir el efecto; "
-              "(4) entrenar con adaptadores (LoRA) para que quepa en una T4; y (5) añadir más texto de Ayacucho de otras fuentes, ya que la ablación sugiere que el modelo sigue mejorando con más datos."),
+              "(4) medir el tiempo de entrenamiento en una T4 real y probar adaptadores (LoRA) para acortarlo; y (5) añadir más texto de Ayacucho de otras fuentes, ya que la ablación sugiere que el modelo sigue mejorando con más datos."),
     ]
 
 

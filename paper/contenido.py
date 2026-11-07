@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-TITULO = "Traducción neuronal español–quechua ayacuchano con NLLB-200 ajustado"
+TITULO = "Traducción neuronal bidireccional español–quechua mediante ajuste fino de NLLB-200"
 
 AUTORES = [
     ("Flavio César Amayo Gamboa", "flavio.amayo.g@uni.pe"),
@@ -55,9 +55,9 @@ def secciones_previas() -> list[tuple]:
     return [
         ("sec", "Introducción"),
         ("p", "El quechua es una familia de lenguas con varios millones de hablantes en los Andes y es oficial en el Perú [3]. "
-              "La variedad de Ayacucho (código ISO quy) sirve de base al quechua sureño estándar, que es el que usan las tareas compartidas de AmericasNLP [3], [4]. "
+              "La variedad de Ayacucho (código ISO quy) es la base del quechua sureño estándar, que es el que usan las tareas compartidas de AmericasNLP [3], [4]. "
               "Es una lengua aglutinante: una palabra suele llevar varios sufijos de caso, persona y tiempo, de modo que el vocabulario observado crece rápido y cada forma aparece pocas veces. "
-              "Hay además pocos textos paralelos con el español, y el recurso más usado, publicaciones de una sola organización, procede de publicaciones religiosas [11]."),
+              "Hay pocos textos paralelos con el español, y el recurso más usado, publicaciones de una sola organización, procede de publicaciones de una sola organización [11]."),
         ("p", "Este trabajo aborda la traducción de oraciones en ambos sentidos, español a quechua y quechua a español. "
               "La entrada es una oración en un idioma y la salida es su traducción al otro. "
               "Medimos el éxito con chrF++ y BLEU sobre un conjunto de prueba que el modelo no vio ni en el entrenamiento ni en la selección de hiperparámetros."),
@@ -66,14 +66,14 @@ def secciones_previas() -> list[tuple]:
               "No entrenamos desde cero porque unas cien mil oraciones no bastan para ello."),
         ("p", "Los conjuntos públicos disponibles en Hugging Face tienen problemas que cambian los números reportados. "
               "En el conjunto de Ayacucho, el 7.3 % de las oraciones en español de validación y el 6.9 % de las de prueba ya estaban en entrenamiento. "
-              "Más de la mitad de las filas son de contenido religioso, en buena parte del tipo de las publicaciones de publicaciones de una sola organización [11]. "
+              "Más de la mitad de las filas tienen el estilo de las publicaciones de publicaciones de una sola organización [11]. "
               "Y hay duplicados y pares mal alineados. Un traductor entrenado con ese material aprende sobre todo el estilo de esas publicaciones, "
               "y un promedio global sobre su conjunto de prueba no dice cuánto traduce fuera de él."),
-        ("p", "Nuestra decisión fue excluir el texto religioso del entrenamiento, la validación y la prueba, y entrenar solo con lo que queda: 49 414 pares de entrenamiento. "
+        ("p", "Nuestra decisión fue excluir ese texto del entrenamiento, la validación y la prueba, y entrenar solo con lo que queda: 49 414 pares de entrenamiento. "
               "Es menos de la mitad de los datos, así que medimos también cuánto aporta el tamaño del conjunto."),
         ("p", "Las contribuciones son:"),
         ("bullets", [
-            "Un conjunto de 122 802 pares español–quechua ayacuchano, limpiado y sin fuga entre particiones, y su subconjunto no religioso de 55 553 pares (49 414, 3 477 y 2 662 en entrenamiento, validación y prueba).",
+            "Un conjunto de 122 802 pares español–quechua ayacuchano, limpiado y sin fuga entre particiones, y su subconjunto sin ese texto de 55 553 pares (49 414, 3 477 y 2 662 en entrenamiento, validación y prueba).",
             "Un modelo bidireccional, NLLB-200 de 600 millones de parámetros ajustado con tres semillas y comparado con el mismo modelo sin ajustar.",
             "Una ablación sobre el tamaño del entrenamiento (25 %, 50 % y 100 % de los datos).",
             "Un análisis de errores por longitud y sufijos, y el servicio y la aplicación Android que usan el modelo.",
@@ -91,7 +91,7 @@ def secciones_previas() -> list[tuple]:
         ("p", "Quechua a español. Ortega et al. [10] tradujeron del quechua al español con un modelo neuronal para una lengua polisintética y segmentación BPE guiada por sufijos. "
               "Cueva et al. [9] usaron un Transformer con LMfusion y segmentación PRPE, y construyeron una interfaz web de traducción."),
         ("p", "Este trabajo se diferencia en tres puntos. Parte de una auditoría de los datos abiertos y reparte las particiones sin fuga. "
-              "Excluye el texto religioso del entrenamiento y de la evaluación, y mide cuánto aporta el tamaño del conjunto que queda. "
+              "Excluye el texto de tipo publicaciones de una sola organización del entrenamiento y de la evaluación, y mide cuánto aporta el tamaño del conjunto que queda. "
               "Y entrega un modelo en ambos sentidos con servicio y aplicación, no solo una tabla de métricas."),
 
         ("sec", "Metodología"),
@@ -102,13 +102,13 @@ def secciones_previas() -> list[tuple]:
         ("p", "La limpieza une las particiones originales, aplica los filtros de la Tabla I y reparte de nuevo por grupos: "
               "todas las filas que comparten una oración en español o en quechua van a la misma partición, elegida con un hash del grupo. "
               "Después de esto, ninguna oración en español ni en quechua aparece en dos particiones. "
-              "Cada fila se marca como religiosa o no. Un primer filtro de cinco palabras (Dios, Jehová, Biblia, Jesús, Cristo) marcó el 34.0 % de las filas, pero una revisión de muestras mostró que dejaba pasar texto del mismo tipo: vocabulario de las revistas (congregación, predicar, adoración), citas como (Is. 55: 9), nombres bíblicos y formas quechuas con sufijos como Diospa. "
-              "El filtro final amplía la lista con ese vocabulario y con patrones de cita, y busca en ambos idiomas. Es conservador: ante la duda marca la fila como religiosa, y por eso descarta también algunas oraciones generales con palabras como alma o Padre, y puede dejar algo de texto religioso sin detectar. "
+              "Cada fila se marca como de tipo publicaciones de una sola organización o no. Un primer filtro de cinco palabras (Dios, Jehová, Biblia, Jesús, Cristo) marcó el 34.0 % de las filas, pero una revisión de muestras mostró que dejaba pasar texto del mismo tipo: vocabulario de las revistas (congregación, predicar, adoración), citas como (Is. 55: 9), nombres bíblicos y formas quechuas con sufijos como Diospa. "
+              "El filtro final amplía la lista con ese vocabulario y con patrones de cita, y busca en ambos idiomas. Es conservador: ante la duda marca la fila como de ese tipo, y por eso descarta también algunas oraciones generales con palabras como alma o Padre, y puede dejar algo de texto de ese tipo sin detectar. "
               "Marca el 55.0 % del entrenamiento, el 49.4 % de la validación y el 56.5 % de la prueba. Esas filas se excluyen de todas las particiones."),
         ("table", "tab:limpieza", "Resumen de la limpieza (variedad Ayacucho)", ["Paso", "Filas"], [list(f) for f in DESCARTES]),
-        ("p", "Antes de excluir el texto religioso las particiones tenían 109 807, 6 877 y 6 118 pares. Después quedan 49 414 de entrenamiento, 3 477 de validación y 2 662 de prueba (Tabla II)."),
-        ("table", "tab:particion", "Particiones antes y después de excluir el texto religioso",
-         ["Partición", "Pares limpios", "Sin texto religioso", "Excluido"],
+        ("p", "Antes de excluir ese texto las particiones tenían 109 807, 6 877 y 6 118 pares. Después quedan 49 414 de entrenamiento, 3 477 de validación y 2 662 de prueba (Tabla II)."),
+        ("table", "tab:particion", "Particiones antes y después de excluir el texto de tipo publicaciones de una sola organización",
+         ["Partición", "Pares limpios", "Tras el filtro", "Excluido"],
          [["Entrenamiento", "109 807", "49 414", "55.0 %"], ["Validación", "6 877", "3 477", "49.4 %"],
           ["Prueba", "6 118", "2 662", "56.5 %"], ["Total", "122 802", "55 553", "54.8 %"]]),
         ("sub", "Modelo"),
@@ -124,11 +124,11 @@ def secciones_previas() -> list[tuple]:
                "L(θ) = −(1/|B|) Σ(x,y)∈B (1/T) Σt=1..T log pθ(yt | y<t, x)"),
         ("p", "Optimizamos con AdamW [14], tasa de aprendizaje 3·10⁻⁵ y decaimiento de pesos 0.01, calentamiento lineal del 5 % de los pasos y decaimiento lineal después, "
               "recorte de gradiente a norma 1, lotes de 32 oraciones de una sola dirección y 3 épocas. La longitud máxima es de 128 tokens. "
-              "Los pesos se mantienen en fp32 y el cálculo usa bf16 con autocast (fp16 con escalado de gradiente en GPU sin bf16, como la T4 de Colab). Cada época evalúa 500 oraciones de validación no religiosas con chrF++ medio de ambas direcciones, "
+              "Los pesos se mantienen en fp32 y el cálculo usa bf16 con autocast (fp16 con escalado de gradiente en GPU sin bf16, como la T4 de Colab). Cada época evalúa 500 oraciones de validación del conjunto filtrado con chrF++ medio de ambas direcciones, "
               "y se conservan los pesos de la mejor época. La prueba se evalúa una sola vez con esos pesos, con búsqueda en haz de ancho 4. "
               "Las semillas son 0, 1 y 2; cambian el orden de los lotes y las 500 oraciones de validación. La ablación usa una fracción aleatoria del entrenamiento (25 % y 50 %) con la semilla 0."),
         ("sub", "Línea base y métricas"),
-        ("p", "La línea base es NLLB-200-distilled-600M sin ajustar (zero-shot) sobre el mismo conjunto de prueba sin texto religioso. "
+        ("p", "La línea base es NLLB-200-distilled-600M sin ajustar (zero-shot) sobre el mismo conjunto de prueba filtrado. "
               "Como referencia publicada, el sistema ganador de 2021 obtuvo 34.6 de chrF en la prueba de AmericasNLP [3], [4]; no es comparable de forma directa porque el conjunto de prueba es otro. "
               "La métrica principal es chrF++ [12], más adecuada que BLEU para una lengua aglutinante, y reportamos también BLEU de sacreBLEU [13]. "
               "Los resultados se separan por dirección y se promedian entre semillas con su desviación estándar."),
@@ -151,7 +151,7 @@ def secciones_previas() -> list[tuple]:
 
 
 TEXTO_DISPONIBILIDAD = (
-    "Código, configuraciones y resultados: repositorio del proyecto (etiqueta v1.0-final). Los pesos del mejor modelo se publican con el enlace indicado en el README. "
+    "Código, configuraciones y resultados: repositorio del proyecto, https://github.com/sergiomc12/traductor-quechua-nllb (etiqueta v1.0-final). Los pesos del mejor modelo se publican con el enlace indicado en el README. "
     "El modelo base NLLB-200 tiene licencia CC-BY-NC 4.0, por lo que el modelo ajustado se limita a uso no comercial. "
     "Se usó Claude Code (Anthropic) para escribir y depurar los scripts de limpieza, entrenamiento y análisis, el servicio, la aplicación Android y los borradores de redacción. "
     "El equipo ejecutó los experimentos y revisó los textos; todas las cifras provienen de esas ejecuciones."
