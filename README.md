@@ -144,7 +144,7 @@ Estado de esta verificación: entrenamos el modelo principal bajo ese tope de 15
 
 ## Modelo, servicio y aplicación
 
-- **Pesos:** enlace **PENDIENTE** (se publican en Hugging Face o Drive y se pegan aquí). Licencia: NLLB-200 es CC-BY-NC 4.0, por lo que el modelo ajustado es solo para uso no comercial.
+- **Pesos:** https://huggingface.co/sergiomc12/nllb600m-es-quy (público; la ficha trae el modo de uso, los resultados y las limitaciones). Es el modelo final `exp_norm15k_s0`, idéntico al de `models/` (misma suma SHA256). Para volver a subirlos: `python scripts/subir_pesos_hf.py`. Licencia: NLLB-200 es CC-BY-NC 4.0, por lo que el modelo ajustado es solo para uso no comercial.
 - **Demo sin entrenar:** `notebooks/demo_colab.ipynb` carga los pesos y traduce (Colab con GPU T4 o CPU).
 - **Servicio:**
 

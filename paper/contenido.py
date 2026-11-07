@@ -151,7 +151,7 @@ def secciones_previas() -> list[tuple]:
 
 
 TEXTO_DISPONIBILIDAD = (
-    "Código, configuraciones y resultados: repositorio del proyecto, https://github.com/sergiomc12/traductor-quechua-nllb (etiqueta v1.0-final). Los pesos del mejor modelo se publican con el enlace indicado en el README. "
+    "Código, configuraciones y resultados: repositorio del proyecto, https://github.com/sergiomc12/traductor-quechua-nllb (etiqueta v1.0-final). Los pesos del modelo final están en https://huggingface.co/sergiomc12/nllb600m-es-quy. "
     "El modelo base NLLB-200 tiene licencia CC-BY-NC 4.0, por lo que el modelo ajustado se limita a uso no comercial. "
     "Se usó Claude Code (Anthropic) para escribir y depurar los scripts de limpieza, entrenamiento y análisis, el servicio, la aplicación Android y los borradores de redacción. "
     "El equipo ejecutó los experimentos y revisó los textos; todas las cifras provienen de esas ejecuciones."

@@ -34,3 +34,6 @@ backup/
 # Enunciado y plantilla del curso: no se suben
 ExamenFinal_MIA_203*.pdf
 Plantilla_Paper_IEEE*.pdf
+
+# Entregables del examen (se envían aparte)
+entrega/
