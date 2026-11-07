@@ -1,0 +1,27 @@
+[2026-11-06 01:28:02] esperando build/bt_exp.fin (GPU ocupada por la cadena anterior)
+[2026-11-06 04:23:03] descubrir: 35 datasets no revisados registrados en results/auto/datasets_nuevos.md
+[2026-11-06 04:23:03] evaluando el modelo base (principal_s0) con el mismo protocolo
+[2026-11-06 04:27:46] === vuelta 1: FLORES dev + RunaSimi + retrotraduccion dirigida a los vacios | config {'bt_n': 6000, 'umbral': 35, 'extra': True, 'epocas': 3, 'motivo': 'FLORES dev + RunaSimi + retrotraduccion dirigida a los vacios'}
+[2026-11-06 04:28:17]   diagnostico: 1919 palabras del vacio
+[2026-11-06 04:29:05]   bt bloque 0000 (1500/6000)
+[2026-11-06 04:29:41]   bt bloque 0001 (3000/6000)
+[2026-11-06 04:30:24]   bt bloque 0002 (4500/6000)
+[2026-11-06 04:31:03]   bt bloque 0003 (6000/6000)
+[2026-11-06 04:31:03]   retrotraduccion: 6000 generadas -> 2868 tras control (umbral 35)
+[2026-11-06 05:03:51]   entrenado en 32.8 min
+[2026-11-06 05:08:34]   seleccion 34.4 vs 32.6 (delta +1.80) | valid 37.8 vs 37.7 (caida -0.10) -> ACEPTADO
+[2026-11-06 05:08:34] === vuelta 2: se acepto la vuelta previa: mas retrotraduccion dirigida (lote nuevo) | config {'bt_n': 6000, 'umbral': 35, 'extra': True, 'epocas': 3, 'motivo': 'se acepto la vuelta previa: mas retrotraduccion dirigida (lote nuevo)'}
+[2026-11-06 05:09:09]   diagnostico: 1815 palabras del vacio
+[2026-11-06 05:09:51]   bt bloque 0000 (1500/6000)
+[2026-11-06 05:10:34]   bt bloque 0001 (3000/6000)
+[2026-11-06 05:11:18]   bt bloque 0002 (4500/6000)
+[2026-11-06 05:11:57]   bt bloque 0003 (6000/6000)
+[2026-11-06 05:11:57]   retrotraduccion: 6000 generadas -> 3482 tras control (umbral 35)
+[2026-11-06 05:43:03]   entrenado en 31.1 min
+[2026-11-06 05:47:49]   seleccion 34.03 vs 34.4 (delta -0.37) | valid 37.45 vs 37.8 (caida +0.35) -> RECHAZADO
+[2026-11-06 05:47:50] === vuelta 3: la retrotraduccion no ayudo: solo FLORES dev + RunaSimi (ablacion) | config {'bt_n': 0, 'umbral': 35, 'extra': True, 'epocas': 3, 'motivo': 'la retrotraduccion no ayudo: solo FLORES dev + RunaSimi (ablacion)'}
+[2026-11-06 05:48:23]   diagnostico: 1815 palabras del vacio
+[2026-11-06 06:21:18]   entrenado en 32.9 min
+[2026-11-06 06:26:01]   seleccion 34.4 vs 34.4 (delta +0.00) | valid 37.8 vs 37.8 (caida +0.00) -> RECHAZADO
+[2026-11-06 06:26:02] politica: sin mas intentos utiles; fin del ciclo
+[2026-11-06 06:26:02] CICLO TERMINADO

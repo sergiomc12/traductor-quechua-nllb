@@ -1,0 +1,20 @@
+{
+  "es->qu": {
+    "chrF++": 25.3,
+    "BLEU": 2.0,
+    "repeticiones": 49,
+    "n": 1012
+  },
+  "qu->es": {
+    "chrF++": 29.5,
+    "BLEU": 8.2,
+    "repeticiones": 23,
+    "n": 1012
+  },
+  "_config": {
+    "modelo": "models/exp_filtrado15_s0/mejor",
+    "split": "devtest",
+    "beams": 4,
+    "segundos": 208
+  }
+}

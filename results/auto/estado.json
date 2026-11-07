@@ -1,0 +1,97 @@
+{
+  "inicio": 1793956982.7661767,
+  "mejor": {
+    "ruta": "D:\\Backend\\traductorquechua\\models\\auto_it1\\mejor",
+    "seleccion": 34.4,
+    "valid": 37.8,
+    "nombre": "auto_it1"
+  },
+  "iteraciones": [
+    {
+      "vuelta": 1,
+      "nombre": "auto_it1",
+      "config": {
+        "bt_n": 6000,
+        "umbral": 35,
+        "extra": true,
+        "epocas": 3,
+        "motivo": "FLORES dev + RunaSimi + retrotraduccion dirigida a los vacios"
+      },
+      "usa_bt": true,
+      "aceptado": true,
+      "seleccion": 34.4,
+      "valid": 37.8,
+      "devtest": {
+        "devtest_es->qu": 30.1,
+        "devtest_qu->es": 32.2
+      },
+      "test": {
+        "test_es->qu": 38.8,
+        "test_qu->es": 33.4
+      }
+    },
+    {
+      "vuelta": 2,
+      "nombre": "auto_it2",
+      "config": {
+        "bt_n": 6000,
+        "umbral": 35,
+        "extra": true,
+        "epocas": 3,
+        "motivo": "se acepto la vuelta previa: mas retrotraduccion dirigida (lote nuevo)"
+      },
+      "usa_bt": true,
+      "aceptado": false,
+      "seleccion": 34.03,
+      "valid": 37.45,
+      "devtest": {
+        "devtest_es->qu": 29.8,
+        "devtest_qu->es": 31.8
+      },
+      "test": {
+        "test_es->qu": 38.7,
+        "test_qu->es": 33.4
+      }
+    },
+    {
+      "vuelta": 3,
+      "nombre": "auto_it3",
+      "config": {
+        "bt_n": 0,
+        "umbral": 35,
+        "extra": true,
+        "epocas": 3,
+        "motivo": "la retrotraduccion no ayudo: solo FLORES dev + RunaSimi (ablacion)"
+      },
+      "usa_bt": true,
+      "aceptado": false,
+      "seleccion": 34.4,
+      "valid": 37.8,
+      "devtest": {
+        "devtest_es->qu": 30.1,
+        "devtest_qu->es": 32.2
+      },
+      "test": {
+        "test_es->qu": 38.8,
+        "test_qu->es": 33.4
+      }
+    }
+  ],
+  "bt_aceptado": [
+    "data/bt/auto_auto_it1.tsv"
+  ],
+  "sin_mejora": 2,
+  "base": {
+    "seleccion": 32.6,
+    "valid": 37.7,
+    "devtest": {
+      "devtest_es->qu": 26.3,
+      "devtest_qu->es": 29.9
+    },
+    "test": {
+      "test_es->qu": 39.0,
+      "test_qu->es": 33.3
+    }
+  },
+  "terminado": true
+}

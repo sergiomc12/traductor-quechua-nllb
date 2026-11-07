@@ -1,0 +1,20 @@
+{
+  "es->qu": {
+    "chrF++": 26.3,
+    "BLEU": 2.0,
+    "repeticiones": 44,
+    "n": 1012
+  },
+  "qu->es": {
+    "chrF++": 30.0,
+    "BLEU": 8.4,
+    "repeticiones": 28,
+    "n": 1012
+  },
+  "_config": {
+    "modelo": "models/exp_bt40_s0/mejor",
+    "split": "devtest",
+    "beams": 4,
+    "segundos": 195
+  }
+}

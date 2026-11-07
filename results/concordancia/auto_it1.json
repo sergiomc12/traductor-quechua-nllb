@@ -1,0 +1,1452 @@
+{
+ "acierto": {
+  "es->qu": 28.6,
+  "es->qu:presente": 37.1,
+  "es->qu:1s": 33.3,
+  "qu->es": 55.8,
+  "qu->es:presente": 54.3,
+  "qu->es:1s": 66.7,
+  "es->qu:2s": 60.0,
+  "qu->es:2s": 0.0,
+  "es->qu:3s": 26.7,
+  "qu->es:3s": 60.0,
+  "es->qu:1pi": 0.0,
+  "qu->es:1pi": 60.0,
+  "es->qu:1pe": 20.0,
+  "qu->es:1pe": 66.7,
+  "es->qu:2p": 20.0,
+  "qu->es:2p": 50.0,
+  "es->qu:3p": 40.0,
+  "qu->es:3p": 66.7,
+  "es->qu:pasado": 31.4,
+  "qu->es:pasado": 40.0,
+  "es->qu:futuro": 17.1,
+  "qu->es:futuro": 80.0
+ },
+ "n": {
+  "es->qu": 105,
+  "es->qu:presente": 35,
+  "es->qu:1s": 15,
+  "qu->es": 95,
+  "qu->es:presente": 35,
+  "qu->es:1s": 15,
+  "es->qu:2s": 15,
+  "qu->es:2s": 10,
+  "es->qu:3s": 15,
+  "qu->es:3s": 15,
+  "es->qu:1pi": 15,
+  "qu->es:1pi": 15,
+  "es->qu:1pe": 15,
+  "qu->es:1pe": 15,
+  "es->qu:2p": 15,
+  "qu->es:2p": 10,
+  "es->qu:3p": 15,
+  "qu->es:3p": 15,
+  "es->qu:pasado": 35,
+  "qu->es:pasado": 35,
+  "es->qu:futuro": 35,
+  "qu->es:futuro": 25
+ },
+ "detalle": [
+  {
+   "dir": "es->qu",
+   "entrada": "Yo trabajo",
+   "esperado": "llamkani",
+   "salida": "Ñoqam llamkani",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqa llamkani",
+   "esperado": "trabajo",
+   "salida": "yo trabajo",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Tú trabajas",
+   "esperado": "llamkanki",
+   "salida": "Qamqa llamkanki",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qam llamkanki",
+   "esperado": "trabajas",
+   "salida": "usted trabaja",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Él/ella trabaja",
+   "esperado": "llamkan",
+   "salida": "Llamkan",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "pay llamkan",
+   "esperado": "trabaja",
+   "salida": "él trabaja",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (inclusivo) trabajamos",
+   "esperado": "llamkanchik",
+   "salida": "Ñoqanchikpas llamkanchikmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqanchik llamkanchik",
+   "esperado": "trabajamos",
+   "salida": "nosotros trabajamos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (exclusivo) trabajamos",
+   "esperado": "llamkaniku",
+   "salida": "Ñoqaykuqa llamkaniku",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqayku llamkaniku",
+   "esperado": "trabajamos",
+   "salida": "nosotros trabajamos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ustedes trabajan",
+   "esperado": "llamkankichik",
+   "salida": "Qamkunaqa llamkankichikmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qamkuna llamkankichik",
+   "esperado": "trabajan",
+   "salida": "ustedes trabajan",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ellos/ellas trabajan",
+   "esperado": "llamkanku",
+   "salida": "Paykunaqa llamkanku",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "paykuna llamkanku",
+   "esperado": "trabajan",
+   "salida": "ellos trabajan",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Yo trabajé",
+   "esperado": "llamkarqani",
+   "salida": "Ñoqam llamkarqani",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqa llamkarqani",
+   "esperado": "trabajé",
+   "salida": "yo estaba trabajando",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Tú trabajaste",
+   "esperado": "llamkarqanki",
+   "salida": "Qammi llamkarqanki",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qam llamkarqanki",
+   "esperado": "trabajaste",
+   "salida": "usted estaba trabajando",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Él/ella trabajó",
+   "esperado": "llamkarqan",
+   "salida": "Payqa llamkarqa",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "pay llamkarqan",
+   "esperado": "trabajó",
+   "salida": "él trabajaba",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (inclusivo) trabajamos",
+   "esperado": "llamkarqanchik",
+   "salida": "Ñoqanchikpas llamkanchikmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqanchik llamkarqanchik",
+   "esperado": "trabajamos",
+   "salida": "nuestro trabajo",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (exclusivo) trabajamos",
+   "esperado": "llamkarqaniku",
+   "salida": "Ñoqaykuqa llamkaniku",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqayku llamkarqaniku",
+   "esperado": "trabajamos",
+   "salida": "nosotros trabajamos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ustedes trabajaron",
+   "esperado": "llamkarqankichik",
+   "salida": "Qamkunam llamkarqankichik",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qamkuna llamkarqankichik",
+   "esperado": "trabajaron",
+   "salida": "ustedes trabajaban",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ellos/ellas trabajaron",
+   "esperado": "llamkarqanku",
+   "salida": "Paykunaqa llamkarqakum",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "paykuna llamkarqanku",
+   "esperado": "trabajaron",
+   "salida": "ellos trabajaban",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Yo trabajaré",
+   "esperado": "llamkasaq",
+   "salida": "Ñoqam llamkani",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqa llamkasaq",
+   "esperado": "trabajaré",
+   "salida": "yo trabajaré",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Tú trabajarás",
+   "esperado": "llamkanki",
+   "salida": "Qamqa llamkanki",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Él/ella trabajará",
+   "esperado": "llamkanqa",
+   "salida": "Paymi llamkanqa",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "pay llamkanqa",
+   "esperado": "trabajará",
+   "salida": "trabajará",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (inclusivo) trabajaremos",
+   "esperado": "llamkasunchik",
+   "salida": "Ñoqanchikpas llamkasunchikmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqanchik llamkasunchik",
+   "esperado": "trabajaremos",
+   "salida": "nosotros trabajaremos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (exclusivo) trabajaremos",
+   "esperado": "llamkasaqku",
+   "salida": "Ñoqanchikmi llamkanqaku",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqayku llamkasaqku",
+   "esperado": "trabajaremos",
+   "salida": "nosotros trabajaríamos",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ustedes trabajarán",
+   "esperado": "llamkankichik",
+   "salida": "Qamkunaqa llamkankichikmi",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ellos/ellas trabajarán",
+   "esperado": "llamkanqaku",
+   "salida": "Paykunam llamkanqaku",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "paykuna llamkanqaku",
+   "esperado": "trabajarán",
+   "salida": "ellos trabajarán",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Yo lloro",
+   "esperado": "waqani",
+   "salida": "Ñoqaqa waqasqayki",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqa waqani",
+   "esperado": "lloro",
+   "salida": "yo lloro",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Tú lloras",
+   "esperado": "waqanki",
+   "salida": "Waqanki",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qam waqanki",
+   "esperado": "lloras",
+   "salida": "tú has llorado",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Él/ella llora",
+   "esperado": "waqan",
+   "salida": "Waqan",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "pay waqan",
+   "esperado": "llora",
+   "salida": "llora",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (inclusivo) lloramos",
+   "esperado": "waqanchik",
+   "salida": "Ñoqanchikpas waqarqaniku",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqanchik waqanchik",
+   "esperado": "lloramos",
+   "salida": "nosotros lloramos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (exclusivo) lloramos",
+   "esperado": "waqaniku",
+   "salida": "Ñoqaykuqa waqaniku",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqayku waqaniku",
+   "esperado": "lloramos",
+   "salida": "nosotros llorábamos",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ustedes lloran",
+   "esperado": "waqankichik",
+   "salida": "Qamkunaqa waqankichikmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qamkuna waqankichik",
+   "esperado": "lloran",
+   "salida": "ustedes lloraron",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ellos/ellas lloran",
+   "esperado": "waqanku",
+   "salida": "Waqanku",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "paykuna waqanku",
+   "esperado": "lloran",
+   "salida": "ellos lloran",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Yo lloré",
+   "esperado": "waqarqani",
+   "salida": "Ñoqam waqarqani",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqa waqarqani",
+   "esperado": "lloré",
+   "salida": "yo lloraba",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Tú lloraste",
+   "esperado": "waqarqanki",
+   "salida": "Qam waqarqanki",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qam waqarqanki",
+   "esperado": "lloraste",
+   "salida": "tú has llorado",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Él/ella lloró",
+   "esperado": "waqarqan",
+   "salida": "Waqarqan",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "pay waqarqan",
+   "esperado": "lloró",
+   "salida": "lloró",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (inclusivo) lloramos",
+   "esperado": "waqarqanchik",
+   "salida": "Ñoqanchikpas waqarqaniku",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqanchik waqarqanchik",
+   "esperado": "lloramos",
+   "salida": "nosotros lloramos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (exclusivo) lloramos",
+   "esperado": "waqarqaniku",
+   "salida": "Ñoqaykuqa waqaniku",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqayku waqarqaniku",
+   "esperado": "lloramos",
+   "salida": "nosotros lloramos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ustedes lloraron",
+   "esperado": "waqarqankichik",
+   "salida": "Qamkunam waqarqankichik",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qamkuna waqarqankichik",
+   "esperado": "lloraron",
+   "salida": "ustedes lloraron",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ellos/ellas lloraron",
+   "esperado": "waqarqanku",
+   "salida": "Paykunaqa waqarqakum",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "paykuna waqarqanku",
+   "esperado": "lloraron",
+   "salida": "ellos lloraban",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Yo lloraré",
+   "esperado": "waqasaq",
+   "salida": "Ñoqam waqaychasaq",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqa waqasaq",
+   "esperado": "lloraré",
+   "salida": "yo lloraré",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Tú llorarás",
+   "esperado": "waqanki",
+   "salida": "Qamqa waqasqayki",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Él/ella llorará",
+   "esperado": "waqanqa",
+   "salida": "Waqanqam",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "pay waqanqa",
+   "esperado": "llorará",
+   "salida": "él llora",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (inclusivo) lloraremos",
+   "esperado": "waqasunchik",
+   "salida": "Ñoqanchikpas waqasunchikmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqanchik waqasunchik",
+   "esperado": "lloraremos",
+   "salida": "nosotros lloraremos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (exclusivo) lloraremos",
+   "esperado": "waqasaqku",
+   "salida": "Ñoqanchikmi waqaychanqaku",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqayku waqasaqku",
+   "esperado": "lloraremos",
+   "salida": "nosotros lloraríamos",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ustedes llorarán",
+   "esperado": "waqankichik",
+   "salida": "Qamkunaqa waqankichikmi",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ellos/ellas llorarán",
+   "esperado": "waqanqaku",
+   "salida": "Paykunam waqanqaku",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "paykuna waqanqaku",
+   "esperado": "llorarán",
+   "salida": "ellos llorarán",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Yo descanso",
+   "esperado": "samani",
+   "salida": "Ñoqaqa samarikuni",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqa samani",
+   "esperado": "descanso",
+   "salida": "yo descanso",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Tú descansas",
+   "esperado": "samanki",
+   "salida": "Qam samarinki",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qam samanki",
+   "esperado": "descansas",
+   "salida": "usted respira",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Él/ella descansa",
+   "esperado": "saman",
+   "salida": "Samarisqa",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "pay saman",
+   "esperado": "descansa",
+   "salida": "él se quema",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (inclusivo) descansamos",
+   "esperado": "samanchik",
+   "salida": "Ñoqanchikpas samarikunchikmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqanchik samanchik",
+   "esperado": "descansamos",
+   "salida": "nosotros respiramos",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (exclusivo) descansamos",
+   "esperado": "samaniku",
+   "salida": "Ñoqanchikpas samarikunchikmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqayku samaniku",
+   "esperado": "descansamos",
+   "salida": "nosotros descansamos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ustedes descansan",
+   "esperado": "samankichik",
+   "salida": "Qamkunaqa samariychik",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qamkuna samankichik",
+   "esperado": "descansan",
+   "salida": "ustedes respiran",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ellos/ellas descansan",
+   "esperado": "samanku",
+   "salida": "Paykunaqa samarikunku",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "paykuna samanku",
+   "esperado": "descansan",
+   "salida": "ellos respiran",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Yo descansé",
+   "esperado": "samarqani",
+   "salida": "Ñoqam samarikurqani",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqa samarqani",
+   "esperado": "descansé",
+   "salida": "yo descanso",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Tú descansaste",
+   "esperado": "samarqanki",
+   "salida": "Qammi samarikurqanki",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qam samarqanki",
+   "esperado": "descansaste",
+   "salida": "usted descansó",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Él/ella descansó",
+   "esperado": "samarqan",
+   "salida": "Samarisqa",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "pay samarqan",
+   "esperado": "descansó",
+   "salida": "él descansó",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (inclusivo) descansamos",
+   "esperado": "samarqanchik",
+   "salida": "Ñoqanchikpas samarikunchikmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqanchik samarqanchik",
+   "esperado": "descansamos",
+   "salida": "nuestro descanso",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (exclusivo) descansamos",
+   "esperado": "samarqaniku",
+   "salida": "Ñoqanchikpas samarikunchikmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqayku samarqaniku",
+   "esperado": "descansamos",
+   "salida": "nosotros descansamos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ustedes descansaron",
+   "esperado": "samarqankichik",
+   "salida": "Qamkunam samaraykuchkankichik",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qamkuna samarqankichik",
+   "esperado": "descansaron",
+   "salida": "ustedes descansaron",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ellos/ellas descansaron",
+   "esperado": "samarqanku",
+   "salida": "Paykunam samarikurqaku",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "paykuna samarqanku",
+   "esperado": "descansaron",
+   "salida": "ellos descansaron",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Yo descansaré",
+   "esperado": "samasaq",
+   "salida": "Ñoqam samarikusaq",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqa samasaq",
+   "esperado": "descansaré",
+   "salida": "yo descansaré",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Tú descansarás",
+   "esperado": "samanki",
+   "salida": "Qammi samarinki",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Él/ella descansará",
+   "esperado": "samanqa",
+   "salida": "Paypas samarikunqa",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "pay samanqa",
+   "esperado": "descansará",
+   "salida": "descansará",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (inclusivo) descansaremos",
+   "esperado": "samasunchik",
+   "salida": "Ñoqanchikpas samarisunchikmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqanchik samasunchik",
+   "esperado": "descansaremos",
+   "salida": "nosotros descansaremos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (exclusivo) descansaremos",
+   "esperado": "samasaqku",
+   "salida": "Ñoqanchikpas samarikunchikmi (exclusivamente)",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqayku samasaqku",
+   "esperado": "descansaremos",
+   "salida": "nosotros descansaríamos",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ustedes descansarán",
+   "esperado": "samankichik",
+   "salida": "Qamkunam samarinkichik",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ellos/ellas descansarán",
+   "esperado": "samanqaku",
+   "salida": "Paykunam samarikunqaku",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "paykuna samanqaku",
+   "esperado": "descansarán",
+   "salida": "ellos descansarán",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Yo vivo",
+   "esperado": "kawsani",
+   "salida": "Ñoqaqa kawsachkani",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqa kawsani",
+   "esperado": "vivo",
+   "salida": "yo vivo",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Tú vives",
+   "esperado": "kawsanki",
+   "salida": "Qam kawsanki",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qam kawsanki",
+   "esperado": "vives",
+   "salida": "tú estás vivo",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Él/ella vive",
+   "esperado": "kawsan",
+   "salida": "Payqa kawsanmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "pay kawsan",
+   "esperado": "vive",
+   "salida": "vive",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (inclusivo) vivimos",
+   "esperado": "kawsanchik",
+   "salida": "Ñoqanchikpas kawsanchikmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqanchik kawsanchik",
+   "esperado": "vivimos",
+   "salida": "nosotros vivimos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (exclusivo) vivimos",
+   "esperado": "kawsaniku",
+   "salida": "Ñoqanchik (kallpanchasqa) kawsanchik",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqayku kawsaniku",
+   "esperado": "vivimos",
+   "salida": "nosotros vivimos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ustedes viven",
+   "esperado": "kawsankichik",
+   "salida": "Qamkunaqa kawsankichikmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qamkuna kawsankichik",
+   "esperado": "viven",
+   "salida": "ustedes viven",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ellos/ellas viven",
+   "esperado": "kawsanku",
+   "salida": "Paykunaqa kawsanku",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "paykuna kawsanku",
+   "esperado": "viven",
+   "salida": "ellos viven",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Yo viví",
+   "esperado": "kawsarqani",
+   "salida": "Ñoqam kawsarqani",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqa kawsarqani",
+   "esperado": "viví",
+   "salida": "yo he resucitado",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Tú viviste",
+   "esperado": "kawsarqanki",
+   "salida": "Qam kawsarqanki",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qam kawsarqanki",
+   "esperado": "viviste",
+   "salida": "tú has vivido",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Él/ella vivió",
+   "esperado": "kawsarqan",
+   "salida": "Payqa kawsarqam",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "pay kawsarqan",
+   "esperado": "vivió",
+   "salida": "resucitó",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (inclusivo) vivimos",
+   "esperado": "kawsarqanchik",
+   "salida": "Ñoqanchikpas kawsanchikmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqanchik kawsarqanchik",
+   "esperado": "vivimos",
+   "salida": "nuestra vida",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (exclusivo) vivimos",
+   "esperado": "kawsarqaniku",
+   "salida": "Ñoqanchik (kallpanchasqa) kawsanchik",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqayku kawsarqaniku",
+   "esperado": "vivimos",
+   "salida": "nosotros sobrevivimos",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ustedes vivieron",
+   "esperado": "kawsarqankichik",
+   "salida": "Qamkunaqa kawsarqankichikmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qamkuna kawsarqankichik",
+   "esperado": "vivieron",
+   "salida": "ustedes vivían",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ellos/ellas vivieron",
+   "esperado": "kawsarqanku",
+   "salida": "Paykunaqa kawsarqakum",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "paykuna kawsarqanku",
+   "esperado": "vivieron",
+   "salida": "vivieron",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Yo viviré",
+   "esperado": "kawsasaq",
+   "salida": "Ñoqaqa kawsachkani",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqa kawsasaq",
+   "esperado": "viviré",
+   "salida": "viviré",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Tú vivirás",
+   "esperado": "kawsanki",
+   "salida": "Qamqa kawsanki",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Él/ella vivirá",
+   "esperado": "kawsanqa",
+   "salida": "Payqa kawsanqam",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "pay kawsanqa",
+   "esperado": "vivirá",
+   "salida": "vivirá",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (inclusivo) viviremos",
+   "esperado": "kawsasunchik",
+   "salida": "Ñoqanchikpas kawsanchikmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqanchik kawsasunchik",
+   "esperado": "viviremos",
+   "salida": "nosotros viviremos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (exclusivo) viviremos",
+   "esperado": "kawsasaqku",
+   "salida": "Ñoqanchikmi kawsanchik",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqayku kawsasaqku",
+   "esperado": "viviremos",
+   "salida": "viviremos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ustedes vivirán",
+   "esperado": "kawsankichik",
+   "salida": "Qamkunaqa kawsankichikmi",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ellos/ellas vivirán",
+   "esperado": "kawsanqaku",
+   "salida": "Paykunam kawsanqaku",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "paykuna kawsanqaku",
+   "esperado": "vivirán",
+   "salida": "ellos vivirán",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Yo escribo",
+   "esperado": "qillqani",
+   "salida": "Ñoqaqa qillqani",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqa qillqani",
+   "esperado": "escribo",
+   "salida": "yo escribí",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Tú escribes",
+   "esperado": "qillqanki",
+   "salida": "Qam qillqasqayki",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qam qillqanki",
+   "esperado": "escribes",
+   "salida": "usted escribió",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Él/ella escribe",
+   "esperado": "qillqan",
+   "salida": "qillqasqa",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "pay qillqan",
+   "esperado": "escribe",
+   "salida": "su libro",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (inclusivo) escribimos",
+   "esperado": "qillqanchik",
+   "salida": "Ñoqanchikpas qillqaniku",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqanchik qillqanchik",
+   "esperado": "escribimos",
+   "salida": "nuestras publicaciones",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (exclusivo) escribimos",
+   "esperado": "qillqaniku",
+   "salida": "Ñoqaykuqa qillqaniku",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqayku qillqaniku",
+   "esperado": "escribimos",
+   "salida": "nosotros escribimos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ustedes escriben",
+   "esperado": "qillqankichik",
+   "salida": "Qamkunaqa qillqasqaykichikmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qamkuna qillqankichik",
+   "esperado": "escriben",
+   "salida": "ustedes escribieron",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ellos/ellas escriben",
+   "esperado": "qillqanku",
+   "salida": "Paykunam qillqachkanku",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "paykuna qillqanku",
+   "esperado": "escriben",
+   "salida": "que ellos escribieron",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Yo escribí",
+   "esperado": "qillqarqani",
+   "salida": "Ñoqam qillqani",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqa qillqarqani",
+   "esperado": "escribí",
+   "salida": "yo escribí",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Tú escribiste",
+   "esperado": "qillqarqanki",
+   "salida": "Qam qillqarqanki",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qam qillqarqanki",
+   "esperado": "escribiste",
+   "salida": "usted escribió",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Él/ella escribió",
+   "esperado": "qillqarqan",
+   "salida": "Payqa qillqarqam",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "pay qillqarqan",
+   "esperado": "escribió",
+   "salida": "él escribió",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (inclusivo) escribimos",
+   "esperado": "qillqarqanchik",
+   "salida": "Ñoqanchikpas qillqaniku",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqanchik qillqarqanchik",
+   "esperado": "escribimos",
+   "salida": "nuestra redacción",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (exclusivo) escribimos",
+   "esperado": "qillqarqaniku",
+   "salida": "Ñoqaykuqa qillqaniku",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqayku qillqarqaniku",
+   "esperado": "escribimos",
+   "salida": "nosotros escribimos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ustedes escribieron",
+   "esperado": "qillqarqankichik",
+   "salida": "Qamkunam qillqarqankichik",
+   "ok": true
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "qamkuna qillqarqankichik",
+   "esperado": "escribieron",
+   "salida": "ustedes escribieron",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ellos/ellas escribieron",
+   "esperado": "qillqarqanku",
+   "salida": "Paykunam qillqarqaku",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "paykuna qillqarqanku",
+   "esperado": "escribieron",
+   "salida": "escritos por ellos",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Yo escribiré",
+   "esperado": "qillqasaq",
+   "salida": "Ñoqam qillqani",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqa qillqasaq",
+   "esperado": "escribiré",
+   "salida": "yo escribiré",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Tú escribirás",
+   "esperado": "qillqanki",
+   "salida": "Qam qillqasunki",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Él/ella escribirá",
+   "esperado": "qillqanqa",
+   "salida": "Pay qillqasqa kanqa",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "pay qillqanqa",
+   "esperado": "escribirá",
+   "salida": "su obra",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (inclusivo) escribiremos",
+   "esperado": "qillqasunchik",
+   "salida": "Ñoqanchikpas qillqasunchikmi",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqanchik qillqasunchik",
+   "esperado": "escribiremos",
+   "salida": "nosotros escribiremos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Nosotros (exclusivo) escribiremos",
+   "esperado": "qillqasaqku",
+   "salida": "Ñoqaykuqa qillqasunchikmi (excluyente)",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "ñuqayku qillqasaqku",
+   "esperado": "escribiremos",
+   "salida": "nosotros escribiremos",
+   "ok": true
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ustedes escribirán",
+   "esperado": "qillqankichik",
+   "salida": "Qamkunaqa qillqasqaykichikmi",
+   "ok": false
+  },
+  {
+   "dir": "es->qu",
+   "entrada": "Ellos/ellas escribirán",
+   "esperado": "qillqanqaku",
+   "salida": "Paykunam qellqarqaku",
+   "ok": false
+  },
+  {
+   "dir": "qu->es",
+   "entrada": "paykuna qillqanqaku",
+   "esperado": "escribirán",
+   "salida": "ellos lo escribirán",
+   "ok": true
+  }
+ ]
+}

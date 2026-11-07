@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TemaApp" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/chicha_oscuro</item>
+        <item name="android:navigationBarColor">@color/crema</item>
+        <item name="android:windowBackground">@color/crema</item>
+        <item name="android:colorAccent">@color/chicha</item>
+        <item name="android:colorControlActivated">@color/chicha</item>
+    </style>
+</resources>

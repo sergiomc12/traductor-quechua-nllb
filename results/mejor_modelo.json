@@ -1,0 +1,110 @@
+{
+  "mejor_modelo": "models/exp_norm15k_s0/mejor",
+  "criterio": "Confirmado con 3 semillas del 15k. Test general: qu->es 33.6±0.1 vs 33.3±0.0 de principal (+0.3 consistente), es->qu 38.6±0.0 vs 38.4±0.3 (sin diferencia). FLORES: qu->es +0.4, es->qu -0.3 (principal solo tiene s0). Examen de concordancia (verbos nuevos): es->qu 57.7±0.9 vs 24.8; qu->es 79.3±2.0 vs 53.7. Se elige exp_norm15k_s0 (mejor test entre las semillas). ADVERTENCIA: la referencia de concordancia usa el paradigma Cusco/Chanka definido por las reglas del dataset, no validado por un hablante; principal_s0 se conserva como baseline seguro.",
+  "resultados_chrF++": {
+    "principal_s0": {
+      "test": [
+        38.7,
+        33.3
+      ],
+      "flores_def": [
+        25.3,
+        29.5
+      ],
+      "flores_nr3": [
+        26.3,
+        29.9
+      ],
+      "valid": 36.8
+    },
+    "exp_norm15k_s0": {
+      "test": [
+        38.7,
+        33.7
+      ],
+      "flores_def": [
+        24.9,
+        29.9
+      ],
+      "flores_nr3": [
+        26.0,
+        30.1
+      ],
+      "valid": null
+    },
+    "exp_norm2k_s0": {
+      "test": [
+        38.6,
+        33.4
+      ],
+      "flores_def": [
+        25.3,
+        29.7
+      ],
+      "flores_nr3": [
+        26.3,
+        30.2
+      ],
+      "valid": 36.8
+    }
+  },
+  "modelos_guardados": [
+    "models/exp_norm15k_central_s0/mejor",
+    "models/exp_norm15k_s0/mejor",
+    "models/exp_norm15k_s1/mejor",
+    "models/exp_norm15k_s2/mejor",
+    "models/exp_norm2k_s0/mejor",
+    "models/principal_s0/mejor"
+  ],
+  "examen_concordancia_acierto_%": {
+    "zeroshot": {
+      "es->qu": 14.3,
+      "qu->es": 27.4
+    },
+    "principal_s0": {
+      "es->qu": 24.8,
+      "qu->es": 53.7
+    },
+    "exp_norm15k_s0": {
+      "es->qu": 57.1,
+      "qu->es": 82.1
+    },
+    "exp_norm2k_s0": {
+      "es->qu": 59.0,
+      "qu->es": 81.1
+    }
+  },
+  "nota_concordancia": "Con verbos fuera del dataset normalizado, exp_norm15k_s0 y exp_norm2k_s0 conjugan mucho mejor que principal_s0 (es->qu ~57-59 vs 24.8; qu->es ~81-82 vs 53.7) sin perder en test general ni FLORES. El 2k rinde igual que el 15k. Pendiente: confirmar con semillas 1 y 2, y que un hablante valide el paradigma Cusco/Chanka usado como referencia.",
+  "baseline_seguro": "models/principal_s0/mejor",
+  "experimento_literatura_central": {
+    "modelo": "models/exp_norm15k_central_s0/mejor",
+    "datos": "receta exp_norm15k + 138 pares de literatura Quechua Central repetidos x3 (15 787 filas extra)",
+    "test_general_chrF++": {
+      "es->qu": 38.5,
+      "qu->es": 33.4
+    },
+    "flores_def_chrF++": {
+      "es->qu": 25.1,
+      "qu->es": 29.9
+    },
+    "central_test_21pares_chrF++": {
+      "principal_s0": [
+        20.9,
+        24.9
+      ],
+      "exp_norm15k_s0": [
+        21.1,
+        26.4
+      ],
+      "exp_norm15k_central_s0": [
+        20.1,
+        28.3
+      ]
+    },
+    "concordancia_%": {
+      "es->qu": 61.9,
+      "qu->es": 76.8
+    },
+    "conclusion": "Sin mejora robusta: general y FLORES iguales (dentro del ruido, test -0.2/-0.3 vs exp_norm15k_s0); en 21 pares de literatura central qu->es sube (28.3 vs 26.4) pero es una muestra minuscula con una semilla. No reemplaza al mejor modelo."
+  }
+}

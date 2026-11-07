@@ -1,0 +1,41 @@
+{
+ "train_qu": {
+  "frases": 49414,
+  "frases_con": 57,
+  "palabras": 353936,
+  "palabras_con": 58,
+  "formas": {
+   "’": 35,
+   "'": 23
+  }
+ },
+ "test_qu": {
+  "frases": 2662,
+  "frases_con": 6,
+  "palabras": 19346,
+  "palabras_con": 6,
+  "formas": {
+   "’": 4,
+   "'": 2
+  }
+ },
+ "salida_es_qu": {
+  "frases": 2662,
+  "frases_con": 26,
+  "palabras": 18788,
+  "palabras_con": 29,
+  "formas": {
+   "'": 29
+  }
+ },
+ "referencia_es_qu": {
+  "frases": 2662,
+  "frases_con": 6,
+  "palabras": 19346,
+  "palabras_con": 6,
+  "formas": {
+   "’": 4,
+   "'": 2
+  }
+ }
+}

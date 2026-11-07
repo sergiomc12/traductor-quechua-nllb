@@ -1,0 +1,52 @@
+{
+  "valid_es->qu": {
+    "chrF++": 39.9,
+    "BLEU": 10.5,
+    "repeticiones": 0,
+    "n": 800
+  },
+  "valid_qu->es": {
+    "chrF++": 35.4,
+    "BLEU": 17.0,
+    "repeticiones": 0,
+    "n": 800
+  },
+  "devcheck_es->qu": {
+    "chrF++": 26.6,
+    "BLEU": 1.9,
+    "repeticiones": 0,
+    "n": 297
+  },
+  "devcheck_qu->es": {
+    "chrF++": 29.8,
+    "BLEU": 8.1,
+    "repeticiones": 0,
+    "n": 297
+  },
+  "devtest_es->qu": {
+    "chrF++": 26.5,
+    "BLEU": 1.9,
+    "repeticiones": 0,
+    "n": 1012
+  },
+  "devtest_qu->es": {
+    "chrF++": 30.5,
+    "BLEU": 8.6,
+    "repeticiones": 0,
+    "n": 1012
+  },
+  "test_es->qu": {
+    "chrF++": 39.0,
+    "BLEU": 10.0,
+    "repeticiones": 0,
+    "n": 2662
+  },
+  "test_qu->es": {
+    "chrF++": 33.3,
+    "BLEU": 14.5,
+    "repeticiones": 0,
+    "n": 2662
+  },
+  "_seleccion": 32.92,
+  "_valid": 37.65
+}

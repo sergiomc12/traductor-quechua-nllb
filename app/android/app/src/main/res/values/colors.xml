@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="chicha">#8E1B2C</color>
+    <color name="chicha_oscuro">#6B1120</color>
+    <color name="oro">#E3A72F</color>
+    <color name="oro_claro">#F6E3B0</color>
+    <color name="crema">#FBF5E9</color>
+    <color name="tarjeta">#FFFFFF</color>
+    <color name="tinta">#2A1A14</color>
+    <color name="tinta_suave">#7A6A60</color>
+    <color name="trazo">#E8DCC4</color>
+</resources>
