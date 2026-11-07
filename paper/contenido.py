@@ -6,7 +6,9 @@ Los numeros de resultados se leen de results/ (ver resultados.py); si faltan, la
 """
 from __future__ import annotations
 
-TITULO = "Traducción neuronal español–quechua ayacuchano con NLLB-200 ajustado sobre texto no religioso"
+from pathlib import Path
+
+TITULO = "Traducción neuronal español–quechua ayacuchano con NLLB-200 ajustado"
 
 AUTORES = [
     ("Flavio César Amayo Gamboa", "flavio.amayo.g@uni.pe"),
@@ -104,11 +106,18 @@ def secciones_previas() -> list[tuple]:
               "El filtro final amplía la lista con ese vocabulario y con patrones de cita, y busca en ambos idiomas. Es conservador: ante la duda marca la fila como religiosa, y por eso descarta también algunas oraciones generales con palabras como alma o Padre, y puede dejar algo de texto religioso sin detectar. "
               "Marca el 55.0 % del entrenamiento, el 49.4 % de la validación y el 56.5 % de la prueba. Esas filas se excluyen de todas las particiones."),
         ("table", "tab:limpieza", "Resumen de la limpieza (variedad Ayacucho)", ["Paso", "Filas"], [list(f) for f in DESCARTES]),
-        ("p", "Antes de excluir el texto religioso las particiones tenían 109 807, 6 877 y 6 118 pares. Después quedan 49 414 de entrenamiento, 3 477 de validación y 2 662 de prueba."),
+        ("p", "Antes de excluir el texto religioso las particiones tenían 109 807, 6 877 y 6 118 pares. Después quedan 49 414 de entrenamiento, 3 477 de validación y 2 662 de prueba (Tabla II)."),
+        ("table", "tab:particion", "Particiones antes y después de excluir el texto religioso",
+         ["Partición", "Pares limpios", "Sin texto religioso", "Excluido"],
+         [["Entrenamiento", "109 807", "49 414", "55.0 %"], ["Validación", "6 877", "3 477", "49.4 %"],
+          ["Prueba", "6 118", "2 662", "56.5 %"], ["Total", "122 802", "55 553", "54.8 %"]]),
         ("sub", "Modelo"),
         ("p", "Partimos de NLLB-200-distilled-600M [1], un Transformer [2] de codificador y decodificador con etiquetas de idioma en la entrada. "
               "Un solo modelo traduce en ambos sentidos: cada par genera dos ejemplos, uno de es a qu (etiquetas spa_Latn y quy_Latn) y otro de qu a es. "
-              "Todos los parámetros se ajustan; no se congela ninguna capa ni se añaden adaptadores."),
+              "Todos los parámetros se ajustan; no se congela ninguna capa ni se añaden adaptadores. "
+              "La Figura 1 resume el flujo: la etiqueta de idioma y la tokenización entran al codificador de 12 capas, y el decodificador de 12 capas genera la traducción con la etiqueta del idioma de destino forzada como primer token."),
+        ("fig", Path(__file__).resolve().parent.parent / "results" / "fig_arquitectura.png",
+         "Arquitectura de NLLB-200-distilled-600M usada para ambas direcciones.", "fig:arquitectura"),
         ("sub", "Función de pérdida y entrenamiento"),
         ("p", "La pérdida es la entropía cruzada con forzado del maestro. Para un lote B de pares (x, y), con x la oración fuente e y la traducción de T tokens:"),
         ("eq", r"\mathcal{L}(\theta) = -\frac{1}{|B|}\sum_{(x,y)\in B}\frac{1}{T}\sum_{t=1}^{T}\log p_\theta\left(y_t \mid y_{<t}, x\right).",
@@ -123,6 +132,21 @@ def secciones_previas() -> list[tuple]:
               "Como referencia publicada, el sistema ganador de 2021 obtuvo 34.6 de chrF en la prueba de AmericasNLP [3], [4]; no es comparable de forma directa porque el conjunto de prueba es otro. "
               "La métrica principal es chrF++ [12], más adecuada que BLEU para una lengua aglutinante, y reportamos también BLEU de sacreBLEU [13]. "
               "Los resultados se separan por dirección y se promedian entre semillas con su desviación estándar."),
+        ("sub", "Modelos comparados"),
+        ("p", "Además del modelo principal entrenamos variantes sobre la misma partición y con los mismos hiperparámetros, todas con la semilla 0. "
+              "Dos quitan el 15 % de los pares de entrenamiento: una al azar y otra los de mayor pérdida bajo NLLB-200 sin ajustar, que sirve de juez independiente porque no vio nuestros datos y suele dar pérdida alta a los pares desalineados. "
+              "Otras dos añaden pares retrotraducidos (español sintético y quechua real, solo en es→qu) y conservan los que, al traducirse de vuelta, alcanzan un chrF++ de al menos 30 o de al menos 40 frente al original. "
+              "El ciclo automático (vuelta 1) añade pares de FLORES-200 dev, de RunaSimi y retrotraducciones dirigidas a los vacíos que detectó el diagnóstico. "
+              "Las tres últimas variantes añaden el conjunto normalizado descrito abajo, completo (15k), reducido a verbos y léxico (2k), o completo junto con pares de literatura quechua central."),
+        ("sub", "Conjunto normalizado y examen de concordancia"),
+        ("p", "El conjunto normalizado parte de un archivo CSV de gran tamaño con oraciones quechua–español cuya procedencia y licencia no verificamos. "
+              "Lo regeneramos con reglas: diez verbos conjugados en siete personas y tres tiempos, sustantivos, adjetivos y adverbios con glosas revisadas por el equipo, "
+              "variantes de escritura tratadas como equivalentes (por ejemplo chaki y ch'aki) y sinónimos en español. "
+              "Las filas dudosas o sin sentido se marcaron para revisión manual y no entran al entrenamiento. Resultan 25 181 filas, de las que usamos 15 373 (15k) o 2 679 (2k). "
+              "Las reglas siguen el paradigma de Cusco y Chanka, que no validó ninguna persona hablante."),
+        ("p", "Para medir si el modelo aprende la conjugación, y no solo memoriza, el examen de concordancia usa cinco verbos que no están en el conjunto normalizado (raíces llamka, waqa, sama, kawsa y qillqa)"
+              "en las siete personas y tres tiempos. Cuenta un acierto cuando la forma verbal esperada aparece en la salida: 105 casos en es→qu y 95 en qu→es. "
+              "La forma esperada sale de las mismas reglas, así que el examen mide si el modelo aprendió ese paradigma, no si coincide con el quechua ayacuchano estándar."),
     ]
 
 

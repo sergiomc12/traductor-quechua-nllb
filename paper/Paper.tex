@@ -7,7 +7,7 @@
 \hyphenation{aglu-ti-nan-te}
 \renewcommand{\IEEEkeywordsname}{Palabras clave}
 \begin{document}
-\title{Traducción neuronal español–quechua ayacuchano con NLLB-200 ajustado sobre texto no religioso}
+\title{Traducción neuronal español–quechua ayacuchano con NLLB-200 ajustado}
 \author{
 \IEEEauthorblockN{Flavio César Amayo Gamboa}
 \IEEEauthorblockA{Maestría en Inteligencia Artificial \\ FIIS – UNI\\Lima, Perú\\flavio.amayo.g@uni.pe}
@@ -23,7 +23,7 @@
 }
 \maketitle
 \begin{abstract}
-El quechua ayacuchano tiene pocos textos paralelos con el español, y los conjuntos públicos mezclan duplicados, fuga entre particiones y mucho contenido religioso. Ajustamos NLLB-200 de 600 millones de parámetros como un solo modelo bidireccional español–quechua. Limpiamos y repartimos sin fuga 122 802 pares públicos, excluimos el 55 \% marcado como religioso y entrenamos con 49 414 pares. En una prueba de 2 662 pares sin texto religioso, tres semillas dan un chrF++ de 38.4 $\pm$ 0.4 (es$\rightarrow$qu) y 33.3 $\pm$ 0.1 (qu$\rightarrow$es), frente a 26.4 y 27.6 del mismo modelo sin ajustar, y un BLEU de 9.8 y 14.7. Entrenar con el 25 \%, el 50 \% y el 100 \% de los datos sube el chrF++ es$\rightarrow$qu de 34.9 a 36.3 y a 38.4, sin señal de saturación. El análisis de errores muestra que el 2 \% de la prueba son encabezados y fechas, que hay pares desalineados y que el 0.5 \% de las salidas es$\rightarrow$qu cae en repeticiones. Los cinco entrenamientos suman 1.6 horas en una GPU de 48 GB. El modelo está desplegado como servicio web y aplicación Android. La prueba proviene de la misma fuente que el entrenamiento y no se validó con hablantes, así que los números no miden el uso real.
+El quechua ayacuchano tiene pocos textos paralelos con el español, y los conjuntos públicos mezclan duplicados, fuga entre particiones y mucho contenido religioso. Ajustamos NLLB-200 de 600 millones de parámetros como un solo modelo bidireccional español–quechua. Limpiamos y repartimos sin fuga 122 802 pares públicos, excluimos el 55 \% marcado como religioso y entrenamos con 49 414 pares. En una prueba de 2 662 pares sin texto religioso, tres semillas dan un chrF++ de 38.4 $\pm$ 0.4 (es$\rightarrow$qu) y 33.3 $\pm$ 0.1 (qu$\rightarrow$es), frente a 26.4 y 27.6 del mismo modelo sin ajustar, y un BLEU de 9.8 y 14.7. Entrenar con el 25 \%, el 50 \% y el 100 \% de los datos sube el chrF++ es$\rightarrow$qu de 34.9 a 36.3 y a 38.4. Comparamos diez modelos. Los cambios en la selección de datos y la retrotraducción no mueven la prueba propia más de un punto. Añadir un conjunto normalizado de verbos y léxico mantiene esa prueba y sube el acierto en la conjugación de verbos nuevos de 24.8 \% a 57.1 \% (es$\rightarrow$qu) y de 53.7 \% a 82.1 \% (qu$\rightarrow$es), por lo que es el modelo final. El 0.5 \% de las salidas es$\rightarrow$qu cae en repeticiones. Los cinco entrenamientos suman 1.6 horas en una GPU de 48 GB. El modelo está desplegado como servicio web y aplicación Android. La prueba proviene de la misma fuente que el entrenamiento y no se validó con hablantes, así que los números no miden el uso real.
 \end{abstract}
 \begin{IEEEkeywords}
 traducción automática neuronal, quechua, lenguas de bajos recursos, NLLB, ajuste fino, chrF++
@@ -83,11 +83,32 @@ Filas limpias & 122 802 \\
 \bottomrule
 \end{tabular}
 \end{table}
-Antes de excluir el texto religioso las particiones tenían 109 807, 6 877 y 6 118 pares. Después quedan 49 414 de entrenamiento, 3 477 de validación y 2 662 de prueba.
+Antes de excluir el texto religioso las particiones tenían 109 807, 6 877 y 6 118 pares. Después quedan 49 414 de entrenamiento, 3 477 de validación y 2 662 de prueba (Tabla II).
 
+\begin{table}[!t]
+\caption{Particiones antes y después de excluir el texto religioso}
+\label{tab:particion}
+\centering\small
+\adjustbox{max width=\columnwidth}{\begin{tabular}{lccc}
+\toprule
+Partición & Pares limpios & Sin texto religioso & Excluido \\
+\midrule
+Entrenamiento & 109 807 & 49 414 & 55.0 \% \\
+Validación & 6 877 & 3 477 & 49.4 \% \\
+Prueba & 6 118 & 2 662 & 56.5 \% \\
+Total & 122 802 & 55 553 & 54.8 \% \\
+\bottomrule
+\end{tabular}}
+\end{table}
 \subsection{Modelo}
-Partimos de NLLB-200-distilled-600M \cite{r1}, un Transformer \cite{r2} de codificador y decodificador con etiquetas de idioma en la entrada. Un solo modelo traduce en ambos sentidos: cada par genera dos ejemplos, uno de es a qu (etiquetas spa\_Latn y quy\_Latn) y otro de qu a es. Todos los parámetros se ajustan; no se congela ninguna capa ni se añaden adaptadores.
+Partimos de NLLB-200-distilled-600M \cite{r1}, un Transformer \cite{r2} de codificador y decodificador con etiquetas de idioma en la entrada. Un solo modelo traduce en ambos sentidos: cada par genera dos ejemplos, uno de es a qu (etiquetas spa\_Latn y quy\_Latn) y otro de qu a es. Todos los parámetros se ajustan; no se congela ninguna capa ni se añaden adaptadores. La Figura 1 resume el flujo: la etiqueta de idioma y la tokenización entran al codificador de 12 capas, y el decodificador de 12 capas genera la traducción con la etiqueta del idioma de destino forzada como primer token.
 
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig_arquitectura.png}
+\caption{Arquitectura de NLLB-200-distilled-600M usada para ambas direcciones.}
+\label{fig:arquitectura}
+\end{figure}
 \subsection{Función de pérdida y entrenamiento}
 La pérdida es la entropía cruzada con forzado del maestro. Para un lote B de pares (x, y), con x la oración fuente e y la traducción de T tokens:
 
@@ -99,9 +120,17 @@ Optimizamos con AdamW \cite{r14}, tasa de aprendizaje $3\cdot 10^{-5}$ y decaimi
 \subsection{Línea base y métricas}
 La línea base es NLLB-200-distilled-600M sin ajustar (zero-shot) sobre el mismo conjunto de prueba sin texto religioso. Como referencia publicada, el sistema ganador de 2021 obtuvo 34.6 de chrF en la prueba de AmericasNLP \cite{r3,r4}; no es comparable de forma directa porque el conjunto de prueba es otro. La métrica principal es chrF++ \cite{r12}, más adecuada que BLEU para una lengua aglutinante, y reportamos también BLEU de sacreBLEU \cite{r13}. Los resultados se separan por dirección y se promedian entre semillas con su desviación estándar.
 
+\subsection{Modelos comparados}
+Además del modelo principal entrenamos variantes sobre la misma partición y con los mismos hiperparámetros, todas con la semilla 0. Dos quitan el 15 \% de los pares de entrenamiento: una al azar y otra los de mayor pérdida bajo NLLB-200 sin ajustar, que sirve de juez independiente porque no vio nuestros datos y suele dar pérdida alta a los pares desalineados. Otras dos añaden pares retrotraducidos (español sintético y quechua real, solo en es$\rightarrow$qu) y conservan los que, al traducirse de vuelta, alcanzan un chrF++ de al menos 30 o de al menos 40 frente al original. El ciclo automático (vuelta 1) añade pares de FLORES-200 dev, de RunaSimi y retrotraducciones dirigidas a los vacíos que detectó el diagnóstico. Las tres últimas variantes añaden el conjunto normalizado descrito abajo, completo (15k), reducido a verbos y léxico (2k), o completo junto con pares de literatura quechua central.
+
+\subsection{Conjunto normalizado y examen de concordancia}
+El conjunto normalizado parte de un archivo CSV de gran tamaño con oraciones quechua–español cuya procedencia y licencia no verificamos. Lo regeneramos con reglas: diez verbos conjugados en siete personas y tres tiempos, sustantivos, adjetivos y adverbios con glosas revisadas por el equipo, variantes de escritura tratadas como equivalentes (por ejemplo chaki y ch'aki) y sinónimos en español. Las filas dudosas o sin sentido se marcaron para revisión manual y no entran al entrenamiento. Resultan 25 181 filas, de las que usamos 15 373 (15k) o 2 679 (2k). Las reglas siguen el paradigma de Cusco y Chanka, que no validó ninguna persona hablante.
+
+Para medir si el modelo aprende la conjugación, y no solo memoriza, el examen de concordancia usa cinco verbos que no están en el conjunto normalizado (raíces llamka, waqa, sama, kawsa y qillqa)en las siete personas y tres tiempos. Cuenta un acierto cuando la forma verbal esperada aparece en la salida: 105 casos en es$\rightarrow$qu y 95 en qu$\rightarrow$es. La forma esperada sale de las mismas reglas, así que el examen mide si el modelo aprendió ese paradigma, no si coincide con el quechua ayacuchano estándar.
+
 \section{Resultados}
 \subsection{Comparación con la línea base}
-La Tabla II compara el modelo ajustado con NLLB-200 sin ajustar sobre los mismos 2 662 pares de prueba. El ajuste mejora el chrF++ en 12.0 puntos en es$\rightarrow$qu y en 5.7 en qu$\rightarrow$es, y el BLEU de 3.2 a 9.8 y de 9.7 a 14.7. La desviación entre las tres semillas es de 0.4 puntos de chrF++ o menos, mucho menor que la mejora. Las dos direcciones no son comparables entre sí: el idioma de destino cambia la métrica.
+La Tabla III compara el modelo ajustado con NLLB-200 sin ajustar sobre los mismos 2 662 pares de prueba. El ajuste mejora el chrF++ en 12.0 puntos en es$\rightarrow$qu y en 5.7 en qu$\rightarrow$es, y el BLEU de 3.2 a 9.8 y de 9.7 a 14.7. La desviación entre las tres semillas es de 0.4 puntos de chrF++ o menos, mucho menor que la mejora. Las dos direcciones no son comparables entre sí: el idioma de destino cambia la métrica.
 
 \begin{table}[!t]
 \caption{Resultados en la prueba (chrF++ y BLEU; media $\pm$ d. e. de 3 semillas)}
@@ -118,8 +147,46 @@ Ajustado, 100 \% (3 semillas) & 38.4 $\pm$ 0.4 & 9.8 $\pm$ 0.2 & 33.3 $\pm$ 0.1 
 \bottomrule
 \end{tabular}}
 \end{table}
+\subsection{Comparación entre modelos y selección del mejor}
+La Tabla IV reúne los diez modelos con tres evaluaciones: la prueba propia, FLORES-200 devtest (1 012 pares, otro dominio) y el examen de concordancia con verbos nuevos. En la prueba propia las diferencias son pequeñas: todos los modelos ajustados quedan entre 38.2 y 38.7 en es$\rightarrow$qu y entre 33.1 y 33.7 en qu$\rightarrow$es, a menos de un punto, que es del orden de la variación entre semillas. Quitar datos, ya sea al azar o por pérdida alta, no ayudó, y la retrotraducción filtrada tampoco mejoró la prueba propia.
+
+\begin{table*}[!t]
+\caption{Comparación de modelos (chrF++ en prueba propia y FLORES devtest; \% de acierto en el examen de concordancia; semilla 0)}
+\label{tab:comparacion}
+\centering\small
+\adjustbox{max width=\textwidth}{\begin{tabular}{lcccccc}
+\toprule
+Modelo & Prueba es$\rightarrow$qu & Prueba qu$\rightarrow$es & FLORES es$\rightarrow$qu & FLORES qu$\rightarrow$es & Conc. es$\rightarrow$qu & Conc. qu$\rightarrow$es \\
+\midrule
+Sin ajustar & 26.4 & 27.6 & 21.5 & 28.4 & 14.3 & 27.4 \\
+Principal & 38.7 & 33.3 & 25.3 & 29.5 & 24.8 & 53.7 \\
+Sin 15 \% al azar & 38.2 & 33.1 & 25.1 & 29.6 & 21.9 & 53.7 \\
+Sin 15 \% peor puntuado & 38.4 & 33.2 & 25.3 & 29.5 & 21.9 & 50.5 \\
+Retrotrad. $\geq$ 30 & 38.4 & 33.4 & 26.7 & 30.0 & 29.5 & 45.3 \\
+Retrotrad. $\geq$ 40 & 38.6 & 33.4 & 26.3 & 30.0 & 28.6 & 49.5 \\
+Ciclo automático (vuelta 1) & 38.5 & 33.4 & 30.1 & 32.2 & 28.6 & 55.8 \\
+Normalizado 2k & 38.6 & 33.4 & 25.3 & 29.7 & 59.0 & 81.1 \\
+Normalizado 15k & 38.7 & 33.7 & 24.9 & 29.9 & 57.1 & 82.1 \\
+Normalizado 15k + literatura central & 38.5 & 33.4 & 25.1 & 29.9 & 61.9 & 76.8 \\
+\bottomrule
+\end{tabular}}
+\end{table*}
+Los modelos se separan en la concordancia. El principal acierta el 24.8 \% en es$\rightarrow$qu y el 53.7 \% en qu$\rightarrow$es, y las variantes que solo cambian datos de entrenamiento o añaden retrotraducción se quedan por debajo del 30 \% en es$\rightarrow$qu y del 56 \% en qu$\rightarrow$es. Con el conjunto normalizado el acierto sube a 57.1 \% y 82.1 \% (15k) y a 59.0 \% y 81.1 \% (2k). Con tres semillas el 15k da 57.7 $\pm$ 1.1 \% y 79.3 $\pm$ 2.4 \%, y el 2k da 57.4 $\pm$ 2.0 \% y 83.2 $\pm$ 2.1 \%, sin pérdida en la prueba propia (15k: 38.6 $\pm$ 0.1 y 33.6 $\pm$ 0.1 de chrF++). Un conjunto de solo 2 679 filas rinde igual que uno de 15 373, de modo que lo que aporta es la cobertura de conjugaciones y no el volumen.
+
+Elegimos el 15k (semilla 0) como modelo final por tres razones: tiene el mejor resultado en la prueba propia en qu$\rightarrow$es (33.7) y empata el mejor en es$\rightarrow$qu (38.7), es el que más acierta en la concordancia qu$\rightarrow$es (82.1 \%) y en FLORES queda a 0.4 puntos del principal en es$\rightarrow$qu y a 0.4 por encima en qu$\rightarrow$es. No gana en todo: el ciclo automático obtiene 30.1 y 32.2 en FLORES, frente a 24.9 y 29.9, pero usó pares de FLORES dev como entrenamiento, y por eso su cifra en FLORES no es comparable, y su concordancia es menor. Con literatura quechua central (138 pares) la concordancia sube en es$\rightarrow$qu y baja en qu$\rightarrow$es y la prueba propia baja entre 0.2 y 0.3 puntos. En 21 pares de literatura central reservados, el chrF++ qu$\rightarrow$es sube de 26.4 a 28.3 y el es$\rightarrow$qu baja de 21.1 a 20.1, una muestra demasiado pequeña y de una sola semilla para concluir algo, por lo que no la adoptamos. El principal se conserva como línea de base.
+
+La Figura 2 desglosa la concordancia por persona y tiempo. El modelo normalizado mejora en casi todas las celdas; la excepción es la segunda persona del singular en es$\rightarrow$qu, que baja de 60.0 \% a 46.7 \%, y en qu$\rightarrow$es la misma persona pasa de 0 \% a 60.0 \%. Cada persona tiene entre 10 y 15 casos, de modo que las diferencias por persona son ruidosas y solo el patrón general es fiable. El pasado en es$\rightarrow$qu sigue siendo el tiempo más bajo (45.7 \%).
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig_concordancia.png}
+\caption{Acierto en el examen de concordancia por persona y tiempo, modelo principal frente a normalizado 15k (semilla 0).}
+\label{fig:concordancia}
+\end{figure}
+La decodificación también cambia los resultados en FLORES. Con el decodificador por defecto, el modelo 15k repite palabras en 56 traducciones es$\rightarrow$qu y 32 qu$\rightarrow$es de 1 012, y alcanza 24.9 y 29.9 de chrF++. Al prohibir repetir 3-gramas, que es lo que usa el servicio, las repeticiones bajan a 0 y 0 y el chrF++ sube a 26.0 y 30.1. En el modelo principal el efecto es parecido (25.3 a 26.3 en es$\rightarrow$qu). Las cifras de la Tabla IV son con el decodificador por defecto; la restricción no invierte la comparación entre el principal y el 15k.
+
 \subsection{Ablación del tamaño del entrenamiento}
-Con el 25 \%, el 50 \% y el 100 \% de los 49 414 pares, el chrF++ es$\rightarrow$qu pasa de 34.9 a 36.3 y a 38.4, y el qu$\rightarrow$es de 31.5 a 32.2 y a 33.3 (Tabla II). Cada duplicación de los datos aporta entre 0.7 y 2.1 puntos (la de 0.7 está cerca de la variación entre semillas), y la curva no se aplana en este rango, de modo que más datos de Ayacucho probablemente ayudarían. Cada punto de la ablación tiene una sola semilla; las diferencias de 1 punto o más superan la desviación observada (0.4) pero las menores no deben interpretarse. La Figura 1 muestra la pérdida de entrenamiento y el chrF++ de validación por época.
+Con el 25 \%, el 50 \% y el 100 \% de los 49 414 pares, el chrF++ es$\rightarrow$qu pasa de 34.9 a 36.3 y a 38.4, y el qu$\rightarrow$es de 31.5 a 32.2 y a 33.3 (Tabla III). Cada duplicación de los datos aporta entre 0.7 y 2.1 puntos (la de 0.7 está cerca de la variación entre semillas), y la curva no se aplana en este rango, de modo que más datos de Ayacucho probablemente ayudarían. Cada punto de la ablación tiene una sola semilla; las diferencias de 1 punto o más superan la desviación observada (0.4) pero las menores no deben interpretarse. La Figura 3 muestra la pérdida de entrenamiento y el chrF++ de validación por época.
 
 \begin{figure}[!t]
 \centering
@@ -128,7 +195,7 @@ Con el 25 \%, el 50 \% y el 100 \% de los 49 414 pares, el chrF++ es$\rightarrow
 \label{fig:curvas}
 \end{figure}
 \subsection{Interpretabilidad y análisis de errores}
-Analizamos las predicciones de la semilla 0 sobre toda la prueba. La Tabla III separa el chrF++ por longitud de la referencia. En es$\rightarrow$qu el chrF++ baja poco, de 40.2 en frases de 1 a 5 palabras a 37.3 en las de 11 a 20; en qu$\rightarrow$es baja de 38.1 a 32.7 en esos mismos tramos.
+Analizamos las predicciones de la semilla 0 sobre toda la prueba. La Tabla V separa el chrF++ por longitud de la referencia. En es$\rightarrow$qu el chrF++ baja poco, de 40.2 en frases de 1 a 5 palabras a 37.3 en las de 11 a 20; en qu$\rightarrow$es baja de 38.1 a 32.7 en esos mismos tramos.
 
 \begin{table}[!t]
 \caption{chrF++ por longitud de la referencia (semilla 0)}
@@ -145,7 +212,7 @@ Longitud & es$\rightarrow$qu & qu$\rightarrow$es & n por dirección \\
 \bottomrule
 \end{tabular}}
 \end{table}
-Para ver dónde falla la morfología medimos, en es$\rightarrow$qu, cuántas palabras de la referencia con un sufijo dado aparecen idénticas en la salida (Tabla IV). Es una medida estricta: exige la palabra completa, y la traducción de referencia puede ser libre, así que un valor bajo no prueba por sí solo un error. Aun así, los sufijos que marcan relaciones (-manta, -wan, -paq) se reproducen mucho menos que -pa, lo que sugiere que la flexión es la parte más difícil.
+Para ver dónde falla la morfología medimos, en es$\rightarrow$qu, cuántas palabras de la referencia con un sufijo dado aparecen idénticas en la salida (Tabla VI). Es una medida estricta: exige la palabra completa, y la traducción de referencia puede ser libre, así que un valor bajo no prueba por sí solo un error. Aun así, los sufijos que marcan relaciones (-manta, -wan, -paq) se reproducen mucho menos que -pa, lo que sugiere que la flexión es la parte más difícil.
 
 \begin{table}[!t]
 \caption{Recall de sufijos en es$\rightarrow$qu (palabra completa idéntica a la referencia)}
@@ -169,6 +236,13 @@ Revisamos además los casos de menor puntaje. Tres hallazgos: (i) 53 de 2 662 pa
 \subsection{Costo computacional}
 Los cinco entrenamientos (tres semillas y dos ablaciones) suman 1.58 horas de GPU, a las que se añaden 0.14 h de evaluación, en una NVIDIA RTX PRO 5000 Blackwell de 48 GB con bf16. Una corrida con todos los datos dura entre 0.41 y 0.43 h, con un pico de 19.5 GB de memoria de vídeo y lotes de 32. En el servidor, que solo tiene CPU, traducir una oración tarda unos 6 s (medido con tres peticiones). No ejecutamos el entrenamiento en una T4: su memoria de 16 GB queda por debajo de nuestro pico, por lo que habría que reducir el lote y usar fp16, algo que el script admite pero que no probamos. No estimamos la huella de carbono.
 
+\subsection{Uso en la aplicación: dirección, voz y apóstrofo}
+El mismo modelo traduce en ambos sentidos y la aplicación deja elegir la dirección; las Tablas III y IV muestran los resultados de las dos. En la práctica resulta más cómodo traducir de español a quechua, porque el reconocimiento de voz de Android funciona para español (la aplicación lo configura como es-PE) y la frase de entrada se puede dictar. Del quechua al español la entrada no se puede dictar con fiabilidad: Android no reconoce quechua, y lo que se dicta se transcribe como si fuera español, así que el texto se escribe a mano. No medimos la tasa de error de ese reconocimiento; lo descrito sale de la configuración de la aplicación y de lo que observó el equipo. La voz de salida tampoco es quechua: usa una voz en español a velocidad reducida, que solo aproxima la pronunciación.
+
+Escribir quechua tiene además un obstáculo ortográfico. Las consonantes eyectivas se marcan con un apóstrofo dentro de la palabra (p'unchaw, ch'aki, t'anta), un carácter que no está en la capa principal del teclado de un teléfono. En los datos casi no aparece: 57 de 49 414 oraciones de entrenamiento (0.1 \%) y 58 de 353 936 palabras llevan apóstrofo interno, y se escribe de dos formas (35 con apóstrofo tipográfico y 23 con apóstrofo recto). La prueba tiene 6 oraciones con apóstrofo. El modelo lo escribe con apóstrofo recto en 29 palabras de sus salidas es$\rightarrow$qu, frente a 6 en las referencias.
+
+Omitir el apóstrofo no es una salida neutra, porque según nuestro léxico a veces distingue palabras: ch'aki (seco) y chaki (pie). Con las 11 palabras con apóstrofo del léxico normalizado, el modelo acierta la glosa en español en 10 con apóstrofo recto, 10 con apóstrofo tipográfico y 8 sin apóstrofo; sin él, ch'aki se traduce como pie, huch'uy como pecar y t'ika como cómodamente. Es una prueba pequeña y con palabras que el modelo vio en el entrenamiento, así que muestra la sensibilidad al apóstrofo y no la capacidad de generalizar.
+
 \section{Discusión}
 El ajuste fino funciona porque NLLB-200 ya conoce la etiqueta quy\_Latn \cite{r1}: con unas decenas de miles de pares adapta la ortografía y el vocabulario cotidiano, y el modelo sin ajustar ya alcanza 26–28 de chrF++. La ablación indica que el límite es el volumen de datos y no la capacidad del modelo, porque la curva sigue subiendo al pasar del 50 \% al 100 \%.
 
@@ -179,7 +253,7 @@ Hay también un límite de variedad. Una prueba pequeña, con 24 fichas de carti
 Sobre impacto y uso responsable: un traductor con este nivel de calidad puede ayudar a leer o redactar mensajes sencillos, pero puede inventar contenido (las repeticiones y los pares desalineados lo muestran) y no debe usarse para textos médicos, legales o administrativos sin revisión humana. El conjunto de datos procede en parte de publicaciones con derechos de autor y no declara licencia, y NLLB-200 se distribuye con licencia CC-BY-NC, por lo que el modelo es solo para uso no comercial. El servicio y la aplicación son prototipos y no se probaron con la comunidad hablante.
 
 \section{Conclusiones}
-Un solo NLLB-200 ajustado con 49 414 pares no religiosos de quechua ayacuchano traduce en ambos sentidos con 38.4 (es$\rightarrow$qu) y 33.3 (qu$\rightarrow$es) de chrF++, unos 12 y 6 puntos más que sin ajustar, con resultados estables entre semillas y mejoras que crecen con el tamaño del entrenamiento. La limpieza y el reparto sin fuga fueron necesarios para poder medir algo.
+Un solo NLLB-200 ajustado con 49 414 pares no religiosos de quechua ayacuchano traduce en ambos sentidos con 38.4 (es$\rightarrow$qu) y 33.3 (qu$\rightarrow$es) de chrF++, unos 12 y 6 puntos más que sin ajustar, con resultados estables entre semillas y mejoras que crecen con el tamaño del entrenamiento. De los diez modelos comparados, solo los que añaden el conjunto normalizado mejoran de forma marcada la conjugación de verbos nuevos (más de 30 puntos), sin perder en la prueba propia; es el modelo final y el que sirve la aplicación. La limpieza y el reparto sin fuga fueron necesarios para poder medir algo.
 
 Como trabajo futuro: (1) evaluar en pruebas externas, como FLORES-200 con quy\_Latn y los conjuntos de AmericasNLP, que provienen de otras fuentes; (2) revisar con un hablante una muestra de la prueba para medir los pares desalineados; (3) reducir las repeticiones con restricciones de decodificación y medir el efecto; (4) entrenar con adaptadores (LoRA) para que quepa en una T4; y (5) añadir más texto de Ayacucho de otras fuentes, ya que la ablación sugiere que el modelo sigue mejorando con más datos.
 
@@ -188,10 +262,10 @@ Como trabajo futuro: (1) evaluar en pruebas externas, como FLORES-200 con quy\_L
 \toprule
 Integrante & Tareas en las que participó \\
 \midrule
-Flavio César Amayo Gamboa & (por completar por el equipo) \\
-Gustavo Adolfo Huarcaya Delgado & (por completar por el equipo) \\
-Jhordy Joel Maximiliano Cusi & (por completar por el equipo) \\
-Sergio Mondragon Contreras & (por completar por el equipo) \\
+Flavio César Amayo Gamboa & Pruebas del modelo, generación del conjunto de datos y normalización del conjunto de datos. Modelo principal y ablación del tamaño del entrenamiento; pruebas de español a quechua. \\
+Gustavo Adolfo Huarcaya Delgado & Pruebas del modelo, generación del conjunto de datos y normalización del conjunto de datos. Modelos sin el 15 \% de los pares (al azar y por pérdida alta) y modelo normalizado 2k; pruebas de quechua a español. \\
+Jhordy Joel Maximiliano Cusi & Pruebas del modelo, generación del conjunto de datos y normalización del conjunto de datos. Modelos con retrotraducción (umbrales 30 y 40) y ciclo automático; pruebas de rendimiento del modelo. \\
+Sergio Mondragon Contreras & Pruebas del modelo, generación del conjunto de datos y normalización del conjunto de datos. Modelos normalizado 15k y con literatura central, incluido el modelo final; optimización de modelos. \\
 \bottomrule
 \end{tabular}
 

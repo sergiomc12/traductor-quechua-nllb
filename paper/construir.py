@@ -56,9 +56,11 @@ def tex_bloque(b: tuple) -> str:
         col = "l" + "c" * (len(cab) - 1)
         cuerpo = "\n".join(" & ".join(esc(str(c)) for c in f) + r" \\" for f in filas)
         tabla = (f"\\begin{{tabular}}{{{col}}}\n\\toprule\n{' & '.join(esc(c) for c in cab)} \\\\\n\\midrule\n{cuerpo}\n\\bottomrule\n\\end{{tabular}}")
-        if len(cab) > 3:  # tablas anchas: se escalan al ancho de la columna para que no se superpongan
-            tabla = f"\\adjustbox{{max width=\\columnwidth}}{{{tabla}}}"
-        return f"\\begin{{table}}[!t]\n\\caption{{{esc(tit)}}}\n\\label{{{etq}}}\n\\centering\\small\n{tabla}\n\\end{{table}}\n"
+        ancha = len(cab) >= 7  # 7 o más columnas: ocupa las dos columnas de la página
+        if len(cab) > 3:  # tablas anchas: se escalan al ancho disponible para que no se superpongan
+            tabla = f"\\adjustbox{{max width={'\\textwidth' if ancha else '\\columnwidth'}}}{{{tabla}}}"
+        env = "table*" if ancha else "table"
+        return f"\\begin{{{env}}}[!t]\n\\caption{{{esc(tit)}}}\n\\label{{{etq}}}\n\\centering\\small\n{tabla}\n\\end{{{env}}}\n"
     if k == "fig":
         _, ruta, tit, etq = b
         return f"\\begin{{figure}}[!t]\n\\centering\n\\includegraphics[width=\\columnwidth]{{{Path(ruta).name}}}\n\\caption{{{esc(tit)}}}\n\\label{{{etq}}}\n\\end{{figure}}\n"
