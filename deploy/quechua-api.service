@@ -8,7 +8,7 @@ Type=simple
 User=quechua
 Group=quechua
 WorkingDirectory=/opt/quechua
-Environment=MODELO_DIR=/opt/quechua/models/principal_s0/mejor
+Environment=MODELO_DIR=/opt/quechua/models/exp_norm15k_s0/mejor
 Environment=PYTHONDONTWRITEBYTECODE=1
 Environment=HF_HUB_OFFLINE=1
 Environment=OMP_NUM_THREADS=3

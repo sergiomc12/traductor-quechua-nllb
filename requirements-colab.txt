@@ -1,0 +1,10 @@
+# Para Google Colab (T4): versiones mínimas, sin fijar, porque Colab trae su propia versión de Python y de torch.
+# Los resultados del artículo se obtuvieron con las versiones exactas de requirements.txt; el código no se probó con versiones
+# anteriores de transformers, así que si algo falla en Colab, instala transformers==5.22.1.
+transformers>=4.57
+sentencepiece
+sacrebleu>=2.5
+pandas
+pyarrow
+numpy
+matplotlib

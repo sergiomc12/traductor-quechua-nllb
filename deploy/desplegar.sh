@@ -11,6 +11,6 @@ DEST="$USERNAME_REMOTE_HOST@$IP_REMOTE_HOST"
 
 mkdir -p build
 export MSYS_NO_PATHCONV=1
-tar -czf build/quechua_paquete.tgz src/__init__.py src/servicio deploy models/principal_s0/mejor
+tar -czf build/quechua_paquete.tgz src/__init__.py src/servicio deploy models/exp_norm15k_s0/mejor
 "$PUTTY/pscp.exe" "${OPC[@]}" build/quechua_paquete.tgz deploy/instalar_en_servidor.sh "$DEST:/tmp/"
 "$PUTTY/plink.exe" "${OPC[@]}" "$DEST" "DOMINIO=$DOMINIO EMAIL=$EMAIL bash /tmp/instalar_en_servidor.sh"

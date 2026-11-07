@@ -1,5 +1,6 @@
 .venv/
-data/
+data/*
+!data/README.md
 papers/
 models/
 .env
@@ -28,3 +29,8 @@ docs/*.pdf
 docs/*.txt
 /*.pdf
 !paper/Paper.pdf
+backup/
+
+# Enunciado y plantilla del curso: no se suben
+ExamenFinal_MIA_203*.pdf
+Plantilla_Paper_IEEE*.pdf

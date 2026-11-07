@@ -48,10 +48,16 @@ def parsear_args() -> argparse.Namespace:
     p.add_argument("--warmup", type=float, default=0.05)
     p.add_argument("--frac-datos", type=float, default=1.0, help="fraccion del entrenamiento a usar (ablacion de tamano)")
     p.add_argument("--train-archivo", default="train", help="nombre (sin .tsv) del entrenamiento en data/limpio/ayacucho_general; 'train' es el original")
+    p.add_argument("--bt-archivo", default="", help="TSV (es, qu) en data/bt/ con pares retrotraducidos; se usan SOLO en es->qu")
+    p.add_argument("--extra-archivo", default="", help="TSV (es, qu) en data/auto/ con pares extra reales (FLORES dev, diccionario); se usan en ambas direcciones")
+    p.add_argument("--extra-rep", type=int, default=1, help="veces que se repite el conjunto extra")
     p.add_argument("--n-valid", type=int, default=500)
     p.add_argument("--n-test", type=int, default=0, help="0 = test completo")
     p.add_argument("--precision", choices=["auto", "bf16", "fp16"], default="auto")
     p.add_argument("--max-pasos", type=int, default=0, help="0 = sin limite; prueba de humo")
+    p.add_argument("--acumulacion", type=int, default=1, help="divide cada lote en N micro-lotes y acumula gradientes (mismo lote efectivo, menos VRAM)")
+    p.add_argument("--checkpointing", action="store_true", help="gradient checkpointing: menos VRAM, mas tiempo")
+    p.add_argument("--limite-vram-gb", type=float, default=0.0, help="tope duro de VRAM en GB (ej. 15 para emular una T4); 0 = FRACCION_VRAM de la GPU")
     p.add_argument("--guardar-pesos", action=argparse.BooleanOptionalAction, default=True)
     return p.parse_args()
 
@@ -72,11 +78,14 @@ def cargar_train(frac: float, semilla: int, archivo: str = "train") -> pd.DataFr
     return df.sample(frac=frac, random_state=semilla).reset_index(drop=True)
 
 
-def armar_lotes(df: pd.DataFrame, batch: int) -> list[tuple[str, str, list[str], list[str]]]:
+def armar_lotes(df: pd.DataFrame, batch: int, bt: pd.DataFrame | None = None) -> list[tuple[str, str, list[str], list[str]]]:
     lotes = []
     for origen, destino in DIRECCIONES:
         src, tgt = df[origen].tolist(), df[destino].tolist()
         lotes.extend((origen, destino, src[i:i + batch], tgt[i:i + batch]) for i in range(0, len(df), batch))
+    if bt is not None:  # retrotraduccion: español sintetico -> quechua REAL; solo en la direccion es->qu
+        src, tgt = bt["es"].tolist(), bt["qu"].tolist()
+        lotes.extend(("es", "qu", src[i:i + batch], tgt[i:i + batch]) for i in range(0, len(bt), batch))
     random.shuffle(lotes)
     return lotes
 
@@ -138,13 +147,29 @@ def evaluar_test(tok, modelo, test: pd.DataFrame, dtipo, salida: Path) -> dict:
     return resumen
 
 
+def paso_con_acumulacion(modelo, tok, lote, dtipo, escala, n: int) -> torch.Tensor:
+    """Backward del lote en n micro-lotes; devuelve la perdida media del lote (para el registro)."""
+    origen, destino, src, tgt = lote
+    tam = -(-len(src) // n)
+    total = torch.zeros((), device="cuda")
+    for i in range(0, len(src), tam):
+        parte = (origen, destino, src[i:i + tam], tgt[i:i + tam])
+        peso = len(parte[2]) / len(src)
+        with torch.autocast("cuda", dtype=dtipo):
+            perdida = modelo(**tokenizar(tok, parte, "cuda")).loss
+        escala.scale(perdida * peso).backward()
+        total += perdida.detach() * peso
+    return total
+
+
 def main() -> None:
     args = parsear_args()
     if not torch.cuda.is_available():
         raise SystemExit("Se necesita CUDA para entrenar; no se entrena en CPU.")
     fijar_semillas(args.semilla)
     # Tope de VRAM: sin el, en Windows (WDDM) la GPU desborda a RAM compartida y se frena ~4x.
-    torch.cuda.set_per_process_memory_fraction(FRACCION_VRAM)
+    total_gb = torch.cuda.get_device_properties(0).total_memory / 2**30
+    torch.cuda.set_per_process_memory_fraction(min(args.limite_vram_gb / total_gb, 1.0) if args.limite_vram_gb else FRACCION_VRAM)
     dtipo = elegir_precision(args.precision)
     usar_escala = dtipo == torch.float16
     escala = torch.amp.GradScaler("cuda", enabled=usar_escala)
@@ -153,6 +178,10 @@ def main() -> None:
     carpeta_res.mkdir(parents=True, exist_ok=True)
 
     train = cargar_train(args.frac_datos, args.semilla, args.train_archivo)
+    if args.extra_archivo:
+        extra = pd.read_csv(RAIZ / "data" / "auto" / f"{args.extra_archivo}.tsv", sep=chr(9), keep_default_na=False)[["es", "qu"]]
+        train = pd.concat([train] + [extra] * args.extra_rep, ignore_index=True)
+        print(f"extra: {len(extra)} pares x{args.extra_rep} (ambas direcciones)", flush=True)
     valid_all = leer("valid")
     valid = valid_all.sample(min(args.n_valid, len(valid_all)), random_state=args.semilla)
     test = leer("test")
@@ -162,7 +191,13 @@ def main() -> None:
 
     tok = AutoTokenizer.from_pretrained(MODELO)
     modelo = AutoModelForSeq2SeqLM.from_pretrained(MODELO).to("cuda").train()  # pesos fp32 + autocast
-    lotes_por_epoca = 2 * -(-len(train) // args.batch)
+    if args.checkpointing:
+        modelo.gradient_checkpointing_enable()
+        modelo.config.use_cache = False
+    bt = pd.read_csv(RAIZ / "data" / "bt" / f"{args.bt_archivo}.tsv", sep=chr(9), keep_default_na=False) if args.bt_archivo else None
+    if bt is not None:
+        print(f"retrotraduccion: {len(bt)} pares (solo es->qu)", flush=True)
+    lotes_por_epoca = 2 * -(-len(train) // args.batch) + (-(-len(bt) // args.batch) if bt is not None else 0)
     total = args.max_pasos or lotes_por_epoca * args.epocas
     opt = torch.optim.AdamW(modelo.parameters(), lr=args.lr, weight_decay=0.01)
     sched = get_linear_schedule_with_warmup(opt, int(total * args.warmup), total)
@@ -172,11 +207,8 @@ def main() -> None:
     t0 = time.time()
     for epoca in range(1, args.epocas + 1):
         perdidas: list[float] = []
-        for lote in armar_lotes(train, args.batch):
-            enc = tokenizar(tok, lote, "cuda")
-            with torch.autocast("cuda", dtype=dtipo):
-                perdida = modelo(**enc).loss
-            escala.scale(perdida).backward()
+        for lote in armar_lotes(train, args.batch, bt):
+            perdida = paso_con_acumulacion(modelo, tok, lote, dtipo, escala, args.acumulacion)
             escala.unscale_(opt)
             torch.nn.utils.clip_grad_norm_(modelo.parameters(), 1.0)
             escala.step(opt)
